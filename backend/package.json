@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^5.0.0",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.37.3",
     "cors": "^2.8.5",
@@ -32,5 +33,9 @@
     "eslint-plugin-promise": "^6.1.1",
     "morgan": "^1.10.0",
     "nodemon": "^3.0.1"
+  },
+  "prisma": {
+    "schema": "src/prisma/schema.prisma",
+    "seed": "node src/prisma/seed.js"
   }
 }
