@@ -1,11 +1,25 @@
 <script setup>
+import Swal from 'sweetalert2'
 import SearchIcon from '../icons/SearchIcon.vue'
 import CartIcon from '../icons/CartIcon.vue'
 
-const emits = defineEmits(['openModal'])
+const emits = defineEmits(['openModal', 'nonAuthenticate'])
+defineProps(['isAuthenticate'])
 
-const showLoginModal = () => {
+const handleShowModal = () => {
 	emits('openModal')
+}
+
+const handleLogout = () => {
+	localStorage.removeItem('user')
+	localStorage.removeItem('token')
+
+	Swal.fire({
+		icon: 'success',
+		title: '登出成功'
+	}).then(() => {
+		emits('nonAuthenticate', false)
+	})
 }
 </script>
 
@@ -46,9 +60,9 @@ const showLoginModal = () => {
 				<CartIcon class="w-8 cursor-pointer hover:text-stone-600" />
 				<button
 					class="rounded-lg bg-orange-400 px-8 hover:bg-orange-300"
-					@click="showLoginModal"
+					@click="isAuthenticate ? handleLogout() : handleShowModal()"
 				>
-					登入
+					{{ isAuthenticate ? '登出' : '登入' }}
 				</button>
 			</div>
 		</nav>

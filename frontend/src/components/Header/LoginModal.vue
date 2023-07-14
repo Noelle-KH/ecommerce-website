@@ -1,8 +1,10 @@
 <script setup>
 import { reactive, ref, watch } from 'vue'
+import Swal from 'sweetalert2'
+import { login } from '../../composable/useAuthApi'
 
-const emits = defineEmits(['closeModal'])
-const role = ref('會員')
+const emits = defineEmits(['closeModal', 'authenticate'])
+const title = ref('會員')
 const formData = reactive({
 	account: '',
 	password: ''
@@ -11,26 +13,30 @@ const formError = reactive({
 	account: null,
 	password: null
 })
+const errorMessage = ref(null)
 
-const clearFormError = () => {
+const clearError = () => {
 	formError.account = null
 	formError.password = null
+	errorMessage.value = null
 }
 
-watch(formError, () => {
-	const timer = setTimeout(clearFormError, 2000)
+watch([formError, errorMessage], () => {
+	const timer = setTimeout(clearError, 2000)
 	return () => clearTimeout(timer)
 })
 
-const handleChangeRole = () => {
-	role.value === '會員' ? (role.value = '商家') : (role.value = '會員')
+const handleChangeTitle = () => {
+	title.value === '會員' ? (title.value = '商家') : (title.value = '會員')
 }
 
 const handleCloseModal = () => {
-	emits('closeModal', false)
+	emits('closeModal')
 }
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
+	clearError()
+
 	if (!formData.account) {
 		formError.account = '帳號不得為空'
 	}
@@ -40,7 +46,40 @@ const handleSubmit = () => {
 	}
 
 	if (!formError.account && !formError.password) {
-		// fetch api
+		try {
+			const role = title.value === '會員' ? 'user' : 'seller'
+			const { user, token, message, code } = await login(
+				role,
+				formData.account,
+				formData.password
+			)
+
+			if (!user && !token) {
+				if (code === 4001) {
+					formError.account = message
+				} else if (code === 4002) {
+					formError.account = message
+					formError.password = message
+				} else {
+					errorMessage.value = message
+				}
+			}
+
+			if (user && token) {
+				localStorage.setItem('user', JSON.stringify(user))
+				localStorage.setItem('token', token)
+
+				Swal.fire({
+					icon: 'success',
+					title: message
+				}).then(() => {
+					emits('closeModal')
+					emits('authenticate', true)
+				})
+			}
+		} catch (error) {
+			console.error(error)
+		}
 	}
 }
 </script>
@@ -58,9 +97,9 @@ const handleSubmit = () => {
 		<form class="z-10 rounded-md bg-white p-12" @submit.prevent="handleSubmit">
 			<h2
 				class="pb-6 text-center text-2xl"
-				:class="[role === '會員' ? 'text-orange-400' : 'text-sky-400']"
+				:class="[title === '會員' ? 'text-orange-400' : 'text-sky-400']"
 			>
-				{{ role }}登入
+				{{ title }}登入
 			</h2>
 
 			<div>
@@ -72,7 +111,8 @@ const handleSubmit = () => {
 				</label>
 				<input
 					type="text"
-					class="mb-6 mt-2 w-full border px-2 py-1 sm:block sm:w-80"
+					class="mb-6 mt-2 w-full rounded-sm border px-2 py-1 sm:block sm:w-80"
+					:class="[formError.account ? 'border-red-400' : 'border-stone-400']"
 					placeholder="請輸入帳號"
 					v-model="formData.account"
 				/>
@@ -87,19 +127,27 @@ const handleSubmit = () => {
 				</label>
 				<input
 					type="password"
-					class="mb-12 mt-2 w-full border px-2 py-1 sm:block sm:w-80"
+					class="mt-2 w-full rounded-sm border px-2 py-1 sm:block sm:w-80"
+					:class="[
+						formError.password ? 'border-red-400' : 'border-stone-400',
+						errorMessage ? 'mb-4' : 'mb-12'
+					]"
 					placeholder="請輸入密碼"
 					v-model="formData.password"
 				/>
 			</div>
+			<p v-if="errorMessage" class="mb-4 text-center text-xs text-red-500">
+				{{ errorMessage }}
+			</p>
 
 			<button
 				class="w-full rounded-sm border py-1"
 				:class="[
-					role === '會員'
+					title === '會員'
 						? 'bg-orange-400 hover:bg-orange-300'
 						: 'bg-sky-400 hover:bg-sky-300'
 				]"
+				:disabled="formError.account && formData.password"
 			>
 				登入
 			</button>
@@ -107,13 +155,13 @@ const handleSubmit = () => {
 				<span
 					class="cursor-pointer tracking-widest text-sky-400 underline hover:text-sky-500"
 					:class="[
-						role === '會員'
+						title === '會員'
 							? 'text-sky-400 hover:text-sky-500'
 							: 'text-orange-400 hover:text-orange-500'
 					]"
-					@click="handleChangeRole"
+					@click="handleChangeTitle"
 				>
-					{{ role === '會員' ? '商家' : '會員' }}登入
+					{{ title === '會員' ? '商家' : '會員' }}登入
 				</span>
 			</p>
 		</form>
