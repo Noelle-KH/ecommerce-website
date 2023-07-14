@@ -86,15 +86,18 @@ const handleSubmit = async () => {
 
 <template>
 	<div
-		class="absolute left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-80"
+		class="fixed left-0 top-0 z-10 flex h-full w-full items-center justify-center bg-black bg-opacity-80"
 		@click.self="handleCloseModal"
 	>
-		<p
-			class="absolute left-[35%] top-3 cursor-pointer rounded-t bg-green-400 px-3 py-2 text-lg hover:top-2"
+		<form
+			class="relative rounded-md bg-white p-12"
+			@submit.prevent="handleSubmit"
 		>
-			註冊
-		</p>
-		<form class="z-10 rounded-md bg-white p-12" @submit.prevent="handleSubmit">
+			<p
+				class="absolute left-[10%] top-[-8%] cursor-pointer rounded-t bg-green-400 px-3 py-2 text-lg hover:font-bold"
+			>
+				註冊
+			</p>
 			<h2
 				class="pb-6 text-center text-2xl"
 				:class="[title === '會員' ? 'text-orange-400' : 'text-sky-400']"

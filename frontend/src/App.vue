@@ -28,8 +28,6 @@ const handleIsAuthenticate = (status) => {
 		@closeModal="handleShowModal"
 		@authenticate="handleIsAuthenticate"
 	/>
-	<main>
-		<RouterView />
-	</main>
+	<RouterView />
 	<PageFooter />
 </template>
