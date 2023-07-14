@@ -20,7 +20,7 @@ const fileFilter = (req, file, cb) => {
   const fileType = file.mimetype.split('/')
   if (!(fileType[0] === 'image' && fileType[1] !== 'svg+xml')) {
     return cb(
-      createError(400, 'Invalid image(accept .jpg, .jpeg or .png)', {
+      createError(400, '請提供 jpg 或 png 圖檔', {
         code: 5003
       })
     )

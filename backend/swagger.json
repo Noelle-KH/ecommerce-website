@@ -4,5 +4,449 @@
     "title": "E-Commerce Website",
     "description": "",
     "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "auth"
+    },
+    {
+      "name": "products"
+    },
+    {
+      "name": "carts"
+    }
+  ],
+  "paths": {
+    "/api/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "role",
+            "description": "確認目前是使用者或是商家進行登入動作",
+            "schema": {
+              "type": "string",
+              "example": "user"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "輸入使用者或商家帳號和密碼",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "登入成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "登入成功"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+                        },
+                        "role": {
+                          "type": "string",
+                          "example": "users"
+                        },
+                        "token": {
+                          "type": "string",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0OGYxZWQ0NWYwZmYyYTk4MTg5ODQ1NCIsImlhdCI6MTY4NzE4ODQ3OSwiZXhwIjoxNjg3MTkyMDc5fQ.kXbfYzld7dtSLd-Q5GMpq5g0cGlyU6d9fmJkVb7SbDU"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "欄位相關驗證錯誤(如：帳號不得為空、密碼不得為空、帳號或密碼錯誤)"
+          },
+          "404": {
+            "description": "帳號不存在"
+          }
+        }
+      }
+    },
+    "/api/products": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "active",
+            "description": "判斷取得上架或下架的所有商品資料",
+            "schema": {
+              "type": "string",
+              "example": "true"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功取得上架或下架的所有商品資料",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "狗狗罐頭"
+                          },
+                          "description": {
+                            "type": "string",
+                            "example": "好吃的狗狗罐頭！"
+                          },
+                          "image": {
+                            "type": "string",
+                            "example": "https://www.example.com"
+                          },
+                          "price": {
+                            "type": "number",
+                            "example": 23
+                          },
+                          "stock": {
+                            "type": "number",
+                            "example": 30
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "products"
+        ],
+        "requestBody": {
+          "description": "輸入商品資料",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Product"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "商家成功新增商品",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "創建新商品成功"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "狗狗罐頭"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "好吃的狗狗罐頭！"
+                        },
+                        "image": {
+                          "type": "string",
+                          "example": "https://www.example.com"
+                        },
+                        "price": {
+                          "type": "number",
+                          "example": 23
+                        },
+                        "stock": {
+                          "type": "number",
+                          "example": 30
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "欄位相關驗證錯誤(如：商品名稱不得為空、請提供 jpg 或 png 圖檔)"
+          },
+          "401": {
+            "description": "請先註冊或登入才能使用功能"
+          },
+          "403": {
+            "description": "沒有使用該頁面的權限"
+          }
+        }
+      }
+    },
+    "/api/products/:id": {
+      "put": {
+        "tags": [
+          "products"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "商品的id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "輸入更新後的商品資料",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Product"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "商家成功更新商品",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "商品更新成功"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "欄位相關驗證錯誤(如：商品名稱不得為空、請提供 jpg 或 png 圖檔)"
+          },
+          "401": {
+            "description": "請先註冊或登入才能使用功能"
+          },
+          "403": {
+            "description": "沒有使用該頁面的權限"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "products"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "商品的id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "更改商品的上下架狀態",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "active": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "商家成功更新商品的上下架狀態",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "商品狀態更新成功"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "請先註冊或登入才能使用功能"
+          },
+          "403": {
+            "description": "沒有使用該頁面的權限"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "products"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "商品的id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "商家成功刪除商品",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "商品刪除成功"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "請先將商品下架再進行刪除動作"
+          },
+          "401": {
+            "description": "請先註冊或登入才能使用功能"
+          },
+          "403": {
+            "description": "沒有使用該頁面的權限"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Login": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "type": "string",
+            "example": "buyer001"
+          },
+          "password": {
+            "type": "string",
+            "example": "titaner"
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "狗狗罐頭"
+          },
+          "description": {
+            "type": "string",
+            "example": "好吃的狗狗罐頭！"
+          },
+          "image": {
+            "type": "string",
+            "example": "https://www.example.com"
+          },
+          "price": {
+            "type": "number",
+            "example": 23
+          },
+          "stock": {
+            "type": "number",
+            "example": 30
+          }
+        }
+      }
+    }
   }
 }
