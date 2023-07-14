@@ -6,11 +6,11 @@ import PageFooter from './components/Footer/PageFooter.vue'
 import LoginModal from './components/Header/LoginModal.vue'
 
 const showLoginModal = ref(false)
+const isAuthenticate = ref(localStorage.getItem('token') !== null)
+
 const handleShowModal = () => {
 	showLoginModal.value = !showLoginModal.value
 }
-
-const isAuthenticate = ref(localStorage.getItem('token') !== null)
 
 const handleIsAuthenticate = (status) => {
 	isAuthenticate.value = status
@@ -28,6 +28,6 @@ const handleIsAuthenticate = (status) => {
 		@closeModal="handleShowModal"
 		@authenticate="handleIsAuthenticate"
 	/>
-	<RouterView />
+	<RouterView :isAuthenticate="isAuthenticate" />
 	<PageFooter />
 </template>
