@@ -1,10 +1,14 @@
-<script setup></script>
+<script setup>
+import { RouterLink } from 'vue-router'
+</script>
 
 <template>
 	<footer class="bg-orange-200">
-		<div class="flex justify-between p-5 px-10 text-center items-center">
+		<div class="flex items-center justify-between p-5 px-10 text-center">
 			<div>
-				<img class="w-24" src="src/assets/logo.png" alt="logo" />
+				<RouterLink :to="{ name: 'HomeView' }">
+					<img class="w-24" src="src/assets/logo.png" alt="logo" />
+				</RouterLink>
 			</div>
 			<div>
 				<h3 class="text-lg font-bold">關於我們</h3>

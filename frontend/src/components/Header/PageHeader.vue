@@ -1,18 +1,31 @@
 <script setup>
+import { useRouter, RouterLink } from 'vue-router'
 import Swal from 'sweetalert2'
 import SearchIcon from '../icons/SearchIcon.vue'
 import CartIcon from '../icons/CartIcon.vue'
+import StoreIcon from '../icons/StoreIcon.vue'
 
 const emits = defineEmits(['openModal', 'nonAuthenticate'])
-defineProps(['isAuthenticate'])
+const props = defineProps(['isAuthenticate', 'role'])
+const router = useRouter()
 
 const handleShowModal = () => {
 	emits('openModal')
 }
 
+const handleGetCart = () => {
+	if (!props.isAuthenticate) {
+		Swal.fire({
+			icon: 'error',
+			text: '請先註冊或登入才能使用功能'
+		})
+	} else {
+		router.push({ name: 'CartView' })
+	}
+}
+
 const handleLogout = () => {
-	localStorage.removeItem('user')
-	localStorage.removeItem('token')
+	localStorage.clear()
 
 	Swal.fire({
 		icon: 'success',
@@ -27,7 +40,9 @@ const handleLogout = () => {
 	<header class="px-10 py-5">
 		<nav class="flex flex-wrap items-center justify-between">
 			<div>
-				<img class="w-24" src="src/assets/logo.png" alt="logo" />
+				<RouterLink :to="{ name: 'HomeView' }">
+					<img class="w-24" src="src/assets/logo.png" alt="logo" />
+				</RouterLink>
 			</div>
 			<div class="flex flex-1 flex-col items-center">
 				<div class="flex">
@@ -57,7 +72,15 @@ const handleLogout = () => {
 				</p>
 			</div>
 			<div class="flex gap-5">
-				<CartIcon class="w-8 cursor-pointer hover:text-stone-600" />
+				<StoreIcon
+					v-if="role === 'seller'"
+					class="w-8 cursor-pointer hover:text-stone-600"
+				/>
+				<CartIcon
+					v-else
+					class="w-8 cursor-pointer hover:text-stone-600"
+					@click="handleGetCart"
+				/>
 				<button
 					class="rounded-lg bg-orange-400 px-8 hover:bg-orange-300"
 					@click="isAuthenticate ? handleLogout() : handleShowModal()"

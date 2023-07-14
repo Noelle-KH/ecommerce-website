@@ -7,6 +7,7 @@ import LoginModal from './components/Header/LoginModal.vue'
 
 const showLoginModal = ref(false)
 const isAuthenticate = ref(localStorage.getItem('token') !== null)
+const role = ref(JSON.parse(localStorage.getItem('user'))?.role)
 
 const handleShowModal = () => {
 	showLoginModal.value = !showLoginModal.value
@@ -14,6 +15,11 @@ const handleShowModal = () => {
 
 const handleIsAuthenticate = (status) => {
 	isAuthenticate.value = status
+	if (status) {
+		role.value = JSON.parse(localStorage.getItem('user')).role
+	} else {
+		role.value = null
+	}
 }
 </script>
 
@@ -22,12 +28,13 @@ const handleIsAuthenticate = (status) => {
 		@openModal="handleShowModal"
 		@nonAuthenticate="handleIsAuthenticate"
 		:isAuthenticate="isAuthenticate"
+		:role="role"
 	/>
 	<LoginModal
 		v-if="showLoginModal"
 		@closeModal="handleShowModal"
 		@authenticate="handleIsAuthenticate"
 	/>
-	<RouterView :isAuthenticate="isAuthenticate" />
+	<RouterView :isAuthenticate="isAuthenticate" :role="role" />
 	<PageFooter />
 </template>

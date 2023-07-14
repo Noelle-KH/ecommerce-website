@@ -4,7 +4,7 @@ import ProductItem from './ProductItem.vue'
 import LoadAnimation from '../LoadAnimation.vue'
 import { getAllProduct } from '../../composable/api/useProductApi'
 
-defineProps(['isAuthenticate'])
+defineProps(['isAuthenticate', 'role'])
 
 const products = ref(null)
 const errorMessage = ref(null)
@@ -35,7 +35,11 @@ onMounted(async () => {
 				:key="product.id"
 				class="rounded-sm shadow-md"
 			>
-				<ProductItem :product="product" :isAuthenticate="isAuthenticate" />
+				<ProductItem
+					:product="product"
+					:isAuthenticate="isAuthenticate"
+					:role="role"
+				/>
 			</div>
 		</div>
 	</section>

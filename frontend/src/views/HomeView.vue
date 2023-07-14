@@ -1,7 +1,7 @@
 <script setup>
 import SideBar from '../components/Home/SideBar.vue'
 import ProductList from '../components/Home/ProductList.vue'
-defineProps(['isAuthenticate'])
+defineProps(['isAuthenticate', 'role'])
 </script>
 
 <template>
@@ -19,7 +19,7 @@ defineProps(['isAuthenticate'])
 		</section>
 		<section class="flex min-h-screen px-10 py-12">
 			<SideBar />
-			<ProductList :isAuthenticate="isAuthenticate" />
+			<ProductList :isAuthenticate="isAuthenticate" :role="role" />
 		</section>
 	</main>
 </template>

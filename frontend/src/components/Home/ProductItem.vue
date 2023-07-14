@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import CartIcon from '../icons/CartIcon.vue'
 import { computed } from 'vue'
 
-const props = defineProps(['product', 'isAuthenticate'])
+const props = defineProps(['product', 'isAuthenticate', 'role'])
 const router = useRouter()
 
 const formatName = computed(() => {
@@ -37,6 +37,7 @@ const handleGetCart = () => {
 
 		<p class="flex items-center justify-end gap-3">
 			<CartIcon
+				v-show="role !== 'seller'"
 				class="h-6 w-6 cursor-pointer text-orange-400 hover:text-orange-500"
 				@click="handleGetCart"
 			/>

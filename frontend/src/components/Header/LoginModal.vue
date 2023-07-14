@@ -1,9 +1,10 @@
 <script setup>
 import { reactive, ref, watch } from 'vue'
 import Swal from 'sweetalert2'
-import { login } from '../../composable/useAuthApi'
+import { login } from '../../composable/api/useAuthApi'
 
 const emits = defineEmits(['closeModal', 'authenticate'])
+
 const title = ref('會員')
 const formData = reactive({
 	account: '',
