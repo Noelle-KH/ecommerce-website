@@ -13,4 +13,26 @@ const loginValidation = (req, res, next) => {
   next()
 }
 
-module.exports = { loginValidation }
+const productValidation = (req, res, next) => {
+  const { name, description, price, stock } = req.body
+
+  if (!name) {
+    return next(createError(400, '商品名稱不得為空'))
+  }
+
+  if (!description) {
+    return next(createError(400, '商品描述不得為空'))
+  }
+
+  if (!price) {
+    return next(createError(400, '商品單價不得為空'))
+  }
+
+  if (!stock) {
+    return next(createError(400, '商品庫存不得為空'))
+  }
+
+  next()
+}
+
+module.exports = { loginValidation, productValidation }
