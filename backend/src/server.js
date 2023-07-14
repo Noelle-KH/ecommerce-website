@@ -4,6 +4,8 @@ const swaggerUi = require('swagger-ui-express')
 
 const swaggerDocument = require('../swagger.json')
 const routes = require('../src/routes/index')
+const errorHandler = require('../src/middleware/error-handler')
+const createError = require('http-errors')
 
 const app = express()
 
@@ -34,11 +36,13 @@ app.get('/', (req, res) => {
   res.send('<h1>Hello World</h1>')
 })
 
-app.all('/*', (req, res) => {
-  res.status(404).json({
-    message: `Cannot found ${req.originalUrl} on this server`
-  })
+app.all('/*', (req, res, next) => {
+  next(
+    createError(404, '無效路由')
+  )
 })
+
+app.use(errorHandler)
 
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`)

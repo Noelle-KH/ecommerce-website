@@ -1,7 +1,8 @@
 const router = require('express').Router()
 
-router.get('/', (req, res) => {
-  res.send('<h1>Hi API</h1>')
-})
+const authController = require('../controllers/auth-controller')
+const { loginValidation } = require('../middleware/validation')
+
+router.post('/login', loginValidation, authController.login)
 
 module.exports = router
