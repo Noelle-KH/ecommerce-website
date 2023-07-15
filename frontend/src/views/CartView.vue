@@ -3,7 +3,7 @@ import CartList from '../components/Cart/CartList.vue'
 </script>
 
 <template>
-	<section>
+	<main class="px-10 py-12">
 		<CartList />
-	</section>
+	</main>
 </template>
