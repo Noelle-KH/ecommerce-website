@@ -1,5 +1,36 @@
 <script setup>
+import { reactive, ref, watch } from 'vue'
 import SearchIcon from '../icons/SearchIcon.vue'
+
+const emits = defineEmits(['filterAmount'])
+
+const range = reactive({
+	min: 0,
+	max: 1000
+})
+const errorMessage = ref(null)
+
+const clearError = () => {
+	errorMessage.value = null
+}
+
+watch(errorMessage, () => {
+	const timer = setTimeout(clearError, 2000)
+	return () => clearTimeout(timer)
+})
+
+const handleSubmit = () => {
+	if (
+		range.max < range.min ||
+		range.min > range.max ||
+		!range.min ||
+		!range.max
+	) {
+		errorMessage.value = '請輸入有效的價格範圍'
+	} else {
+		emits('filterAmount', { min: range.min, max: range.max })
+	}
+}
 </script>
 
 <template>
@@ -8,10 +39,24 @@ import SearchIcon from '../icons/SearchIcon.vue'
 			<h3 class="mb-6 text-xl font-bold text-orange-400">篩選</h3>
 			<p class="mb-3 text-lg font-semibold text-sky-400">金額</p>
 			<label class="pr-1">NT$ </label>
-			<input type="text" class="w-10 rounded-sm border border-stone-400" />
+			<input
+				type="text"
+				class="w-12 rounded-sm border border-stone-400 pl-1"
+				v-model="range.min"
+			/>
 			<span class="px-1">-</span>
-			<input type="text" class="mr-2 w-10 rounded-sm border border-stone-400" />
-			<SearchIcon class="inline h-7 w-7 cursor-pointer active:scale-90" />
+			<input
+				type="text"
+				class="mr-2 w-12 rounded-sm border border-stone-400 pl-1"
+				v-model="range.max"
+			/>
+			<SearchIcon
+				class="inline h-7 w-7 cursor-pointer active:scale-90"
+				@click="handleSubmit"
+			/>
+			<p v-if="errorMessage" class="ml-4 mt-2 text-sm text-red-500">
+				{{ errorMessage }}
+			</p>
 		</div>
 	</aside>
 </template>
