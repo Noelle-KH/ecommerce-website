@@ -6,10 +6,32 @@ const authController = {
   getAllProduct: async (req, res, next) => {
     try {
       const active = req.query.active !== 'false'
-      const products = await prisma.product.findMany({
+      const { keyword, min, max, orderBy } = req.query
+      let filter = {
         where: { active },
         orderBy: { createdAt: 'desc' }
-      })
+      }
+
+      if (keyword) {
+        filter = {
+          ...filter,
+          where: { active, name: { contains: keyword } }
+        }
+      } else if (min && max) {
+        filter = {
+          ...filter,
+          where: {
+            active,
+            price: { lte: Number(max), gte: Number(min) }
+          }
+        }
+      }
+
+      if (orderBy) {
+        filter = { ...filter, orderBy: { [orderBy]: 'desc' } }
+      }
+
+      const products = await prisma.product.findMany(filter)
 
       res.json({
         status: 'success',
