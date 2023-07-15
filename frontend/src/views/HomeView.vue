@@ -1,12 +1,12 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import HeroSection from '../components/Home/HeroSection.vue'
 import SideBar from '../components/Home/SideBar.vue'
 import ProductList from '../components/Home/ProductList.vue'
 import LoadAnimation from '../components/LoadAnimation.vue'
 import { getAllProduct } from '../composable/api/useProductApi'
 
-defineProps(['isAuthenticate', 'role'])
+const props = defineProps(['isAuthenticate', 'role', 'keyword'])
 
 const products = ref([])
 const searchResult = ref(null)
@@ -25,6 +25,13 @@ onMounted(async () => {
 	}
 })
 
+watch(
+	() => props.keyword,
+	(keyword) => {
+		handleSearchResult(keyword)
+	}
+)
+
 const handleSearchResult = async (filterQuery) => {
 	try {
 		isLoading.value = true
@@ -42,7 +49,7 @@ const handleSearchResult = async (filterQuery) => {
 	<main>
 		<HeroSection />
 		<section class="relative flex min-h-screen px-10 py-12">
-			<SideBar @filterQuery="handleSearchResult" />
+			<SideBar @filterAmount="handleSearchResult" />
 			<ProductList
 				v-if="searchResult ? searchResult : products"
 				:isAuthenticate="isAuthenticate"

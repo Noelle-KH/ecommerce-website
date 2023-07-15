@@ -1,13 +1,16 @@
 <script setup>
+import { ref } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import Swal from 'sweetalert2'
 import SearchIcon from '../icons/SearchIcon.vue'
 import CartIcon from '../icons/CartIcon.vue'
 import StoreIcon from '../icons/StoreIcon.vue'
 
-const emits = defineEmits(['openModal', 'nonAuthenticate'])
+const emits = defineEmits(['openModal', 'nonAuthenticate', 'filterKeyword'])
 const props = defineProps(['isAuthenticate', 'role'])
 const router = useRouter()
+
+const keyword = ref('')
 
 const handleShowModal = () => {
 	emits('openModal')
@@ -24,6 +27,10 @@ const handleGetCart = () => {
 	}
 }
 
+const handleSubmit = () => {
+	emits('filterKeyword', { keyword: keyword.value })
+}
+
 const handleLogout = () => {
 	localStorage.clear()
 
@@ -32,6 +39,7 @@ const handleLogout = () => {
 		title: '登出成功'
 	}).then(() => {
 		emits('nonAuthenticate', false)
+		router.push({ name: 'HomeView' })
 	})
 }
 </script>
@@ -50,9 +58,11 @@ const handleLogout = () => {
 						class="rounded-l-md border border-stone-600 px-2 sm:w-72"
 						type="text"
 						placeholder="搜尋關鍵字"
+						v-model="keyword"
 					/>
 					<button
 						class="flex h-10 items-center rounded-r-md border border-stone-600 bg-orange-400 px-2 hover:bg-orange-300"
+						@click="handleSubmit"
 					>
 						<SearchIcon class="w-8" />
 					</button>
@@ -71,7 +81,7 @@ const handleLogout = () => {
 					</button>
 				</p>
 			</div>
-			<div class="flex gap-5">
+			<div class="flex items-center gap-5">
 				<StoreIcon
 					v-if="role === 'seller'"
 					class="w-8 cursor-pointer hover:text-stone-600"
@@ -82,7 +92,7 @@ const handleLogout = () => {
 					@click="handleGetCart"
 				/>
 				<button
-					class="rounded-lg bg-orange-400 px-8 hover:bg-orange-300"
+					class="rounded-md bg-orange-400 px-8 py-2 hover:bg-orange-300"
 					@click="isAuthenticate ? handleLogout() : handleShowModal()"
 				>
 					{{ isAuthenticate ? '登出' : '登入' }}
