@@ -29,7 +29,7 @@
             "description": "確認目前是使用者或是商家進行登入動作",
             "schema": {
               "type": "string",
-              "example": "user"
+              "example": "buyer"
             }
           }
         ],

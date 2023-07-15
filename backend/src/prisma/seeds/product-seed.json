@@ -1,0 +1,44 @@
+[
+  {
+    "name": "拍不壞的塑膠球",
+    "description": "滿足每隻好奇的貓貓",
+    "image": "https://res.cloudinary.com/dcgkzdjtr/image/upload/v1689350885/productImage/hiyv2abbsmhkw1dsbjm0.png",
+    "price": 400,
+    "stock": 10
+  },
+  {
+    "name": "咬不爛的棒球",
+    "description": "保證任何狗狗都咬不爛",
+    "image": "https://res.cloudinary.com/dcgkzdjtr/image/upload/v1689350818/productImage/njbkbcf4eqz3thsqd1kw.png",
+    "price": 380,
+    "stock": 20
+  },
+  {
+    "name": "貓貓罐頭",
+    "description": "美味的貓貓罐頭",
+    "image": "https://res.cloudinary.com/dcgkzdjtr/image/upload/v1689350742/productImage/auzbhb0dq2hkgyligss1.png",
+    "price": 70,
+    "stock": 10
+  },
+  {
+    "name": "玩不破的泡泡球",
+    "description": "旋轉跳躍貓貓閉著眼",
+    "image": "https://res.cloudinary.com/dcgkzdjtr/image/upload/v1689351226/productImage/pns2p08kzk4jobu8q3fw.png",
+    "price": 500,
+    "stock": 2
+  },
+  {
+    "name": "狗狗罐頭",
+    "description": "美味的狗狗罐頭",
+    "image": "https://res.cloudinary.com/dcgkzdjtr/image/upload/v1689324118/productImage/zld7k1bmaopkp3a2ubdk.png",
+    "price": 80,
+    "stock": 30
+  },
+  {
+    "name": "咬不膩的咬咬玩具",
+    "description": "耗盡狗狗旺盛的體力",
+    "image": "https://res.cloudinary.com/dcgkzdjtr/image/upload/v1689351117/productImage/kdpywauwfswfiqg8xvdr.png",
+    "price": 600,
+    "stock": 8
+  }
+]
