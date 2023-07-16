@@ -11,39 +11,39 @@ const role = ref(JSON.parse(localStorage.getItem('user'))?.role)
 const keyword = ref('')
 
 const handleShowModal = () => {
-	showLoginModal.value = !showLoginModal.value
+  showLoginModal.value = !showLoginModal.value
 }
 
 const handleIsAuthenticate = (status) => {
-	isAuthenticate.value = status
-	if (status) {
-		role.value = JSON.parse(localStorage.getItem('user')).role
-	} else {
-		role.value = null
-	}
+  isAuthenticate.value = status
+  if (status) {
+    role.value = JSON.parse(localStorage.getItem('user')).role
+  } else {
+    role.value = null
+  }
 }
 const handleSearchKeyword = (filterQuery) => {
-	keyword.value = filterQuery
+  keyword.value = filterQuery
 }
 </script>
 
 <template>
-	<PageHeader
-		@openModal="handleShowModal"
-		@nonAuthenticate="handleIsAuthenticate"
-		@filterKeyword="handleSearchKeyword"
-		:isAuthenticate="isAuthenticate"
-		:role="role"
-	/>
-	<LoginModal
-		v-if="showLoginModal"
-		@closeModal="handleShowModal"
-		@authenticate="handleIsAuthenticate"
-	/>
-	<RouterView
-		:isAuthenticate="isAuthenticate"
-		:role="role"
-		:keyword="keyword"
-	/>
-	<PageFooter />
+  <PageHeader
+    @openModal="handleShowModal"
+    @nonAuthenticate="handleIsAuthenticate"
+    @filterKeyword="handleSearchKeyword"
+    :isAuthenticate="isAuthenticate"
+    :role="role"
+  />
+  <LoginModal
+    v-if="showLoginModal"
+    @closeModal="handleShowModal"
+    @authenticate="handleIsAuthenticate"
+  />
+  <RouterView
+    :isAuthenticate="isAuthenticate"
+    :role="role"
+    :keyword="keyword"
+  />
+  <PageFooter />
 </template>

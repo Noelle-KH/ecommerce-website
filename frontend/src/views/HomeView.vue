@@ -15,61 +15,61 @@ const errorMessage = ref(null)
 const isLoading = ref(false)
 
 onMounted(async () => {
-	try {
-		isLoading.value = true
-		const productsData = await getAllProduct()
-		const categoriesData = await getCategories()
-		products.value = productsData.products
-		categories.value = categoriesData.categories
-	} catch (error) {
-		errorMessage.value = error.message
-	} finally {
-		isLoading.value = false
-	}
+  try {
+    isLoading.value = true
+    const productsData = await getAllProduct()
+    const categoriesData = await getCategories()
+    products.value = productsData.products
+    categories.value = categoriesData.categories
+  } catch (error) {
+    errorMessage.value = error.message
+  } finally {
+    isLoading.value = false
+  }
 })
 
 watch(
-	() => props.keyword,
-	(keyword) => {
-		handleSearchResult(keyword)
-	}
+  () => props.keyword,
+  (keyword) => {
+    handleSearchResult(keyword)
+  }
 )
 
 const handleSearchResult = async (filterQuery) => {
-	try {
-		isLoading.value = true
-		const data = await getAllProduct(filterQuery)
-		searchResult.value = data.products
-	} catch (error) {
-		errorMessage.value = error.message
-	} finally {
-		isLoading.value = false
-	}
+  try {
+    isLoading.value = true
+    const data = await getAllProduct(filterQuery)
+    searchResult.value = data.products
+  } catch (error) {
+    errorMessage.value = error.message
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 
 <template>
-	<main>
-		<HeroSection />
-		<section class="relative flex min-h-screen px-10 py-12">
-			<SideBar
-				@filterAmount="handleSearchResult"
-				@filterCategory="handleSearchResult"
-				:categoriesData="categories ? categories : ''"
-			/>
-			<ProductList
-				v-if="searchResult ? searchResult : products"
-				:isAuthenticate="isAuthenticate"
-				:role="role"
-				:products="searchResult ? searchResult : products"
-			/>
-			<LoadAnimation
-				v-if="isLoading && !errorMessage"
-				class="absolute left-[50%] top-[20%]"
-			/>
-			<p v-if="errorMessage" class="absolute left-[35%] top-[20%]">
-				{{ errorMessage }}
-			</p>
-		</section>
-	</main>
+  <main>
+    <HeroSection />
+    <section class="relative flex min-h-screen px-10 py-12">
+      <SideBar
+        @filterAmount="handleSearchResult"
+        @filterCategory="handleSearchResult"
+        :categoriesData="categories ? categories : ''"
+      />
+      <ProductList
+        v-if="searchResult ? searchResult : products"
+        :isAuthenticate="isAuthenticate"
+        :role="role"
+        :products="searchResult ? searchResult : products"
+      />
+      <LoadAnimation
+        v-if="isLoading && !errorMessage"
+        class="absolute left-[50%] top-[20%]"
+      />
+      <p v-if="errorMessage" class="absolute left-[35%] top-[20%]">
+        {{ errorMessage }}
+      </p>
+    </section>
+  </main>
 </template>
