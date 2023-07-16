@@ -48,7 +48,7 @@ const handleSubmit = async () => {
 
 	if (!formError.account && !formError.password) {
 		try {
-			const role = title.value === '會員' ? 'user' : 'seller'
+			const role = title.value === '會員' ? 'buyer' : 'seller'
 			const { user, token, message, code } = await login(
 				role,
 				formData.account,
