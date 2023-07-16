@@ -13,6 +13,9 @@
       "name": "products"
     },
     {
+      "name": "category"
+    },
+    {
       "name": "carts"
     }
   ],
@@ -46,7 +49,7 @@
         },
         "responses": {
           "200": {
-            "description": "登入成功",
+            "description": "登入成功，使用者登入回傳資料會包含購物車id，商家登入則不會有購物車id",
             "content": {
               "application/json": {
                 "schema": {
@@ -63,13 +66,22 @@
                     "data": {
                       "type": "object",
                       "properties": {
-                        "id": {
-                          "type": "string",
-                          "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
-                        },
-                        "role": {
-                          "type": "string",
-                          "example": "users"
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+                            },
+                            "role": {
+                              "type": "string",
+                              "example": "users"
+                            },
+                            "cart": {
+                              "type": "string",
+                              "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+                            }
+                          }
                         },
                         "token": {
                           "type": "string",
@@ -104,6 +116,42 @@
             "schema": {
               "type": "string",
               "example": "true"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min",
+            "description": "搜尋金額範圍的最小值",
+            "schema": {
+              "type": "number",
+              "example": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "max",
+            "description": "搜尋金額範圍的最大值",
+            "schema": {
+              "type": "number",
+              "example": 1000
+            }
+          },
+          {
+            "in": "query",
+            "name": "keyword",
+            "description": "搜尋關鍵字",
+            "schema": {
+              "type": "string",
+              "example": "狗狗罐頭"
+            }
+          },
+          {
+            "in": "query",
+            "name": "categoryId",
+            "description": "搜尋商品分類的id",
+            "schema": {
+              "type": "string",
+              "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
             }
           }
         ],
@@ -309,25 +357,17 @@
               "type": "string",
               "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
             }
+          },
+          {
+            "in": "query",
+            "name": "active",
+            "description": "商品要更改的狀態",
+            "schema": {
+              "type": "boolean",
+              "example": true
+            }
           }
         ],
-        "requestBody": {
-          "description": "更改商品的上下架狀態",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "active": {
-                    "type": "boolean",
-                    "example": true
-                  }
-                }
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "200": {
             "description": "商家成功更新商品的上下架狀態",
@@ -402,6 +442,363 @@
           },
           "403": {
             "description": "沒有使用該頁面的權限"
+          }
+        }
+      }
+    },
+    "/api/carts": {
+      "get": {
+        "tags": [
+          "carts"
+        ],
+        "responses": {
+          "200": {
+            "description": "成功取得目前購物車內的資料",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+                        },
+                        "cartItem": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+                              },
+                              "amount": {
+                                "type": "number",
+                                "example": 5
+                              },
+                              "product": {
+                                "$ref": "#/components/schemas/Product"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "請先註冊或登入才能使用功能"
+          },
+          "403": {
+            "description": "沒有使用該頁面的權限"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "carts"
+        ],
+        "responses": {
+          "200": {
+            "description": "成功更新購物車狀態(結帳)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "購物車狀態更新成功"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "商品庫存數量不足"
+          },
+          "401": {
+            "description": "請先註冊或登入才能使用功能"
+          },
+          "403": {
+            "description": "沒有使用該頁面的權限"
+          }
+        }
+      }
+    },
+    "/api/carts/:productId": {
+      "post": {
+        "tags": [
+          "carts"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "productId",
+            "description": "預計加入購物車的商品id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功新增商品進入購物車",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "新增購物車商品成功"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+                        },
+                        "amount": {
+                          "type": "number",
+                          "example": 1
+                        },
+                        "product": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+                            },
+                            "name": {
+                              "type": "string",
+                              "example": "狗狗罐頭"
+                            },
+                            "description": {
+                              "type": "string",
+                              "example": "好吃的狗狗罐頭！"
+                            },
+                            "image": {
+                              "type": "string",
+                              "example": "https://www.example.com"
+                            },
+                            "price": {
+                              "type": "number",
+                              "example": 30
+                            },
+                            "stock": {
+                              "type": "number",
+                              "example": 20
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "商品庫存數量不足"
+          },
+          "401": {
+            "description": "請先註冊或登入才能使用功能"
+          },
+          "403": {
+            "description": "沒有使用該頁面的權限"
+          }
+        }
+      }
+    },
+    "/api/carts/:cartItemId": {
+      "patch": {
+        "tags": [
+          "carts"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "cartItemId",
+            "description": "預計更新的購物車內項目id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "輸入更新的購物車項目數量",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number",
+                    "example": 10
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "成功更新購物車內商品數量",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "購物車商品數量更新成功"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "商品庫存數量不足"
+          },
+          "401": {
+            "description": "請先註冊或登入才能使用功能"
+          },
+          "403": {
+            "description": "沒有使用該頁面的權限"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "carts"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "cartItemId",
+            "description": "預計更新的購物車內項目id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "輸入更新的購物車項目數量",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number",
+                    "example": 10
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "成功刪除購物車內商品數量",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "購物車商品刪除成功"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "請先註冊或登入才能使用功能"
+          },
+          "403": {
+            "description": "沒有使用該頁面的權限"
+          }
+        }
+      }
+    },
+    "/api/categories": {
+      "get": {
+        "tags": [
+          "category"
+        ],
+        "responses": {
+          "200": {
+            "description": "取得所有分類的資料",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "狗狗商品"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
