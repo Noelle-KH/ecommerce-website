@@ -9,16 +9,23 @@ const authController = {
     try {
       const { role } = req.query
       const { account, password } = req.body
-      const foundUser = await prisma.user.findFirst({
-        where: { account },
-        include: {
-          cart: {
-            where: { checkout: false },
-            select: { id: true }
-          }
-        }
-      })
-      if (!foundUser || foundUser.role !== role) {
+
+      const query =
+        role === 'buyer'
+          ? {
+              where: { account },
+              include: {
+                cart: {
+                  where: { checkout: false },
+                  select: { id: true }
+                }
+              }
+            }
+          : { where: { account } }
+
+      const foundUser = await prisma.user.findFirst(query)
+
+      if (!foundUser) {
         throw createError(404, '帳號不存在', { code: 4001 })
       }
 
@@ -27,11 +34,17 @@ const authController = {
         throw createError(400, '帳號或密碼錯誤', { code: 4002 })
       }
 
-      const user = {
-        id: foundUser.id,
-        role: foundUser.role,
-        cartId: foundUser.cart[0].id
-      }
+      const user =
+        role === 'buyer'
+          ? {
+              id: foundUser.id,
+              role: foundUser.role,
+              cartId: foundUser.cart[0].id
+            }
+          : {
+              id: foundUser.id,
+              role: foundUser.role
+            }
 
       const token = jwt.sign({ user }, process.env.TOKEN_SECRET, {
         expiresIn: '1d'
