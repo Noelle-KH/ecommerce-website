@@ -4,11 +4,12 @@ import HeroSection from '../components/Home/HeroSection.vue'
 import SideBar from '../components/Home/SideBar.vue'
 import ProductList from '../components/Home/ProductList.vue'
 import LoadAnimation from '../components/LoadAnimation.vue'
-import { getAllProduct } from '../composable/api/useProductApi'
+import { getAllProduct, getCategories } from '../composable/api/useProductApi'
 
 const props = defineProps(['isAuthenticate', 'role', 'keyword'])
 
 const products = ref([])
+const categories = ref([])
 const searchResult = ref(null)
 const errorMessage = ref(null)
 const isLoading = ref(false)
@@ -16,8 +17,10 @@ const isLoading = ref(false)
 onMounted(async () => {
 	try {
 		isLoading.value = true
-		const data = await getAllProduct()
-		products.value = data.products
+		const productsData = await getAllProduct()
+		const categoriesData = await getCategories()
+		products.value = productsData.products
+		categories.value = categoriesData.categories
 	} catch (error) {
 		errorMessage.value = error.message
 	} finally {
@@ -49,7 +52,11 @@ const handleSearchResult = async (filterQuery) => {
 	<main>
 		<HeroSection />
 		<section class="relative flex min-h-screen px-10 py-12">
-			<SideBar @filterAmount="handleSearchResult" />
+			<SideBar
+				@filterAmount="handleSearchResult"
+				@filterCategory="handleSearchResult"
+				:categoriesData="categories ? categories : ''"
+			/>
 			<ProductList
 				v-if="searchResult ? searchResult : products"
 				:isAuthenticate="isAuthenticate"
