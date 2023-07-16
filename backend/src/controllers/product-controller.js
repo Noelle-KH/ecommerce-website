@@ -6,7 +6,7 @@ const authController = {
   getAllProduct: async (req, res, next) => {
     try {
       const active = req.query.active !== 'false'
-      const { keyword, min, max, orderBy } = req.query
+      const { keyword, min, max, orderBy, categoryId } = req.query
       let filter = {
         where: { active },
         include: { category: true },
@@ -24,6 +24,14 @@ const authController = {
           where: {
             active,
             price: { lte: Number(max), gte: Number(min) }
+          }
+        }
+      } else if (categoryId) {
+        filter = {
+          ...filter,
+          where: {
+            active,
+            categoryId
           }
         }
       }
