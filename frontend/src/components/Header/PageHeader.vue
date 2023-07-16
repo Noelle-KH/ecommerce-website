@@ -39,7 +39,7 @@ const handleLogout = () => {
 		title: '登出成功'
 	}).then(() => {
 		emits('nonAuthenticate', false)
-		router.push({ name: 'HomeView' })
+		router.replace({ name: 'HomeView' })
 	})
 }
 </script>
@@ -82,15 +82,20 @@ const handleLogout = () => {
 				</p>
 			</div>
 			<div class="flex items-center gap-5">
-				<StoreIcon
-					v-if="role === 'seller'"
-					class="w-8 cursor-pointer hover:text-stone-600"
-				/>
-				<CartIcon
-					v-else
-					class="w-8 cursor-pointer hover:text-stone-600"
-					@click="handleGetCart"
-				/>
+				<RouterLink
+					:to="role === 'seller' ? { name: 'StoreView' } : { name: 'CartView' }"
+				>
+					<StoreIcon
+						v-if="role === 'seller'"
+						class="w-8 cursor-pointer hover:text-stone-600"
+					/>
+					<CartIcon
+						v-else
+						class="w-8 cursor-pointer hover:text-stone-600"
+						@click="handleGetCart"
+					/>
+				</RouterLink>
+
 				<button
 					class="rounded-md bg-orange-400 px-8 py-2 hover:bg-orange-300"
 					@click="isAuthenticate ? handleLogout() : handleShowModal()"

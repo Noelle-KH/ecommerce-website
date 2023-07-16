@@ -3,7 +3,7 @@ import StoreItem from './StoreItem.vue'
 import PutOnIcon from '../icons/PutOnIcon.vue'
 import TackOffIcon from '../icons/TackOffIcon.vue'
 
-const props = defineProps(['active'])
+const props = defineProps(['active', 'products'])
 const emits = defineEmits(['openModal'])
 
 const title = props.active ? '上架' : '下架'
@@ -40,13 +40,11 @@ const handleOpenModal = () => {
 					<th>商品描述</th>
 					<th>商品單價</th>
 					<th>商品庫存</th>
-					<th>更新商品</th>
+					<th>{{ active ? '更新' : '上架' }}商品</th>
 				</tr>
 			</thead>
-			<tbody>
-				<StoreItem :active="active" />
-				<StoreItem :active="active" />
-				<StoreItem :active="active" />
+			<tbody v-for="product in products" :key="product.id">
+				<StoreItem :active="active" :product="product" />
 			</tbody>
 		</table>
 	</section>
