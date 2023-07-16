@@ -9,6 +9,7 @@ const authController = {
       const { keyword, min, max, orderBy } = req.query
       let filter = {
         where: { active },
+        include: { category: true },
         orderBy: { createdAt: 'desc' }
       }
 
@@ -46,14 +47,15 @@ const authController = {
   postProduct: async (req, res, next) => {
     try {
       const { file } = req
-      const { name, description, price, stock } = req.body
+      const { name, description, price, stock, categoryId } = req.body
 
       const data = {
         name,
         description,
         image: file.path,
         price: Number(price),
-        stock: Number(stock)
+        stock: Number(stock),
+        categoryId
       }
       const product = await prisma.product.create({ data })
 
@@ -72,7 +74,7 @@ const authController = {
     try {
       const { id } = req.params
       const { file } = req
-      const { name, description, price, stock } = req.body
+      const { name, description, price, stock, categoryId } = req.body
 
       const foundProduct = await prisma.product.findFirst({ where: { id } })
       if (!foundProduct) {
@@ -83,7 +85,8 @@ const authController = {
         description,
         image: file.path || foundProduct.image,
         price: Number(price),
-        stock: Number(stock)
+        stock: Number(stock),
+        categoryId
       }
 
       await prisma.product.update({ where: { id }, data: { ...updateData } })
