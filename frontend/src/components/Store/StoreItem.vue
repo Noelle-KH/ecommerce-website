@@ -1,9 +1,30 @@
 <script setup>
+import Swal from 'sweetalert2'
 import DeleteIcon from '../icons/DeleteIcon.vue'
 import PutOnIcon from '../icons/PutOnIcon.vue'
 import TackOffIcon from '../icons/TackOffIcon.vue'
 
-defineProps(['active', 'product'])
+const props = defineProps(['active', 'product'])
+const emits = defineEmits(['toggleActive', 'deleteProduct'])
+
+const handleDeleteProduct = (id) => {
+	Swal.fire({
+		icon: 'warning',
+		title: '確定要刪除商品嗎?',
+		showCancelButton: true,
+		confirmButtonText: '確定',
+		cancelButtonText: '取消'
+	}).then((result) => {
+		if (result.isConfirmed) {
+			return emits('deleteProduct', id)
+		}
+		return
+	})
+}
+
+const handleToggleActive = (id) => {
+	emits('toggleActive', id, props.active)
+}
 </script>
 
 <template>
@@ -12,10 +33,12 @@ defineProps(['active', 'product'])
 			<DeleteIcon
 				v-if="!active"
 				class="mx-auto h-5 w-5 cursor-pointer hover:text-stone-600"
+				@click="handleDeleteProduct(product.id)"
 			/>
 			<TackOffIcon
 				v-if="active"
 				class="mx-auto h-5 w-5 cursor-pointer hover:text-stone-600"
+				@click="handleToggleActive(product.id)"
 			/>
 		</td>
 		<td>
@@ -26,7 +49,11 @@ defineProps(['active', 'product'])
 		<td>NT$ {{ product.price }}</td>
 		<td>{{ product.stock }}</td>
 		<td class="cursor-pointer underline hover:font-bold">
-			<PutOnIcon v-if="!active" class="mx-auto h-5 w-5 cursor-pointer" />
+			<PutOnIcon
+				v-if="!active"
+				class="mx-auto h-5 w-5 cursor-pointer"
+				@click="handleToggleActive(product.id)"
+			/>
 			<span v-else>更新</span>
 		</td>
 	</tr>

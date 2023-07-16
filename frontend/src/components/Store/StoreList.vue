@@ -1,16 +1,34 @@
 <script setup>
+import { ref, watch } from 'vue'
 import StoreItem from './StoreItem.vue'
 import PutOnIcon from '../icons/PutOnIcon.vue'
 import TackOffIcon from '../icons/TackOffIcon.vue'
 
-const props = defineProps(['active', 'products'])
-const emits = defineEmits(['openModal'])
+const props = defineProps(['active', 'productsData'])
+const emits = defineEmits(['openModal', 'toggleActive', 'deleteProduct'])
+
+const products = ref(props.productsData)
 
 const title = props.active ? '上架' : '下架'
 const tableHeader = props.active ? '下架' : '刪除'
 
+watch(
+	() => props.productsData,
+	(newProducts) => {
+		products.value = newProducts
+	}
+)
+
 const handleOpenModal = () => {
 	emits('openModal', true)
+}
+
+const handleToggleActive = (id, active) => {
+	emits('toggleActive', id, active)
+}
+
+const handleDeleteProduct = (id) => {
+	emits('deleteProduct', id)
 }
 </script>
 
@@ -44,7 +62,12 @@ const handleOpenModal = () => {
 				</tr>
 			</thead>
 			<tbody v-for="product in products" :key="product.id">
-				<StoreItem :active="active" :product="product" />
+				<StoreItem
+					:active="active"
+					:product="product"
+					@deleteProduct="handleDeleteProduct"
+					@toggleActive="handleToggleActive"
+				/>
 			</tbody>
 		</table>
 	</section>

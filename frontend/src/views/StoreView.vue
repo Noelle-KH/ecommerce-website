@@ -15,10 +15,6 @@ const nonActiveProducts = ref([])
 const isLoading = ref(false)
 const errorMessage = ref(null)
 
-const handleShowModal = (type) => {
-	showAddItemModal.value = type
-}
-
 onMounted(async () => {
 	try {
 		if (!props.isAuthenticate || props.role !== 'seller') {
@@ -40,20 +36,63 @@ onMounted(async () => {
 		isLoading.value = false
 	}
 })
+
+const handleShowModal = (type) => {
+	showAddItemModal.value = type
+}
+
+const toggleProductData = (id, originPosition, newPosition) => {
+	const product = originPosition.value.find((product) => product.id === id)
+	originPosition.value = originPosition.value
+		.map((product) =>
+			product.id === id ? { ...product, active: !product.active } : product
+		)
+		.filter((product) => product.id !== id)
+
+	console.log(originPosition.value)
+
+	newPosition.value = [
+		...newPosition.value,
+		{ ...product, active: !product.active }
+	]
+}
+
+const handleToggleActive = (id, active) => {
+	if (active) {
+		toggleProductData(id, activeProducts, nonActiveProducts)
+	} else {
+		toggleProductData(id, nonActiveProducts, activeProducts)
+	}
+}
+
+const handleDeleteProduct = (id) => {
+	nonActiveProducts.value = nonActiveProducts.value.filter(
+		(product) => product.id !== id
+	)
+}
 </script>
 
 <template>
 	<main class="px-10 py-12">
 		<p v-if="errorMessage">{{ errorMessage }}</p>
 		<p v-if="isLoading && !errorMessage">loading</p>
-		<div v-if="activeProducts.length && nonActiveProducts.length">
+		<div
+			v-if="Array.isArray(activeProducts) && Array.isArray(nonActiveProducts)"
+		>
 			<AddItemModal v-if="showAddItemModal" @closeModal="handleShowModal" />
 			<StoreList
 				:active="true"
-				:products="activeProducts"
+				:productsData="activeProducts"
 				@openModal="handleShowModal"
+				@toggleActive="handleToggleActive"
+				@deleteProduct="handleDeleteProduct"
 			/>
-			<StoreList :active="false" :products="nonActiveProducts" />
+			<StoreList
+				:active="false"
+				:productsData="nonActiveProducts"
+				@toggleActive="handleToggleActive"
+				@deleteProduct="handleDeleteProduct"
+			/>
 		</div>
 	</main>
 </template>
