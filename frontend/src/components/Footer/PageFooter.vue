@@ -7,7 +7,7 @@ import { RouterLink } from 'vue-router'
 		<div class="flex items-center justify-between p-5 px-10 text-center">
 			<div>
 				<RouterLink :to="{ name: 'HomeView' }">
-					<img class="w-24" src="src/assets/logo.png" alt="logo" />
+					<img class="w-24" src="../../assets/logo.png" alt="logo" />
 				</RouterLink>
 			</div>
 			<div>

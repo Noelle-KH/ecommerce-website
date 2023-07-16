@@ -49,7 +49,7 @@ const handleLogout = () => {
 		<nav class="flex flex-wrap items-center justify-between">
 			<div>
 				<RouterLink :to="{ name: 'HomeView' }">
-					<img class="w-24" src="src/assets/logo.png" alt="logo" />
+					<img class="w-24" src="../../assets/logo.png" alt="logo" />
 				</RouterLink>
 			</div>
 			<div class="flex flex-1 flex-col items-center">
