@@ -9,6 +9,7 @@ const categoryController = {
       })
 
       res.json({
+        status: 'success',
         data: { categories }
       })
     } catch (error) {

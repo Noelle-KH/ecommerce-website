@@ -5,8 +5,9 @@ const prisma = new PrismaClient()
 const cartController = {
   getCartItems: async (req, res, next) => {
     try {
+      const buyerId = req.user.id
       const cart = await prisma.cart.findFirst({
-        where: { checkout: false },
+        where: { checkout: false, buyerId },
         include: {
           cartItem: {
             include: { product: true }
@@ -101,7 +102,31 @@ const cartController = {
   },
   updateCartStatus: async (req, res, next) => {},
   updateCartItem: async (req, res, next) => {},
-  deleteCartItem: async (req, res, next) => {}
+  deleteCartItem: async (req, res, next) => {
+    try {
+      const { id } = req.params
+      const cartItem = await prisma.cartItem.findFirst({ where: { id } })
+
+      if (!cartItem) {
+        throw createError(404, '該購物車商品不存在')
+      }
+
+      await Promise.all([
+        prisma.product.update(
+          { where: { id: cartItem.productId } },
+          { stock: { increment: cartItem.amount } }
+        ),
+        prisma.cartItem.delete({ where: { id } })
+      ])
+
+      res.json({
+        status: 'success',
+        message: '刪除購物車商品成功'
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 module.exports = cartController

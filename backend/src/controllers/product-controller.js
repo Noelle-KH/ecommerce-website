@@ -110,7 +110,7 @@ const authController = {
   updateProductStatus: async (req, res, next) => {
     try {
       const { id } = req.params
-      const { active } = req.body
+      const active = req.query.active !== 'false'
 
       await prisma.product.update({ where: { id }, data: { active } })
 
