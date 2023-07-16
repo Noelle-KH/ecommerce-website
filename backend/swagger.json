@@ -504,44 +504,6 @@
           }
         }
       },
-      "patch": {
-        "tags": [
-          "carts"
-        ],
-        "responses": {
-          "200": {
-            "description": "成功更新購物車狀態(結帳)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "example": "success"
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "購物車狀態更新成功"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "商品庫存數量不足"
-          },
-          "401": {
-            "description": "請先註冊或登入才能使用功能"
-          },
-          "403": {
-            "description": "沒有使用該頁面的權限"
-          }
-        }
-      }
-    },
-    "/api/carts/:productId": {
       "post": {
         "tags": [
           "carts"
@@ -558,6 +520,27 @@
             }
           }
         ],
+        "requestBody": {
+          "description": "提供產品的id",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "productId": {
+                    "type": "string",
+                    "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "成功新增商品進入購物車",
@@ -615,6 +598,42 @@
                           }
                         }
                       }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "商品庫存數量不足"
+          },
+          "401": {
+            "description": "請先註冊或登入才能使用功能"
+          },
+          "403": {
+            "description": "沒有使用該頁面的權限"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "carts"
+        ],
+        "responses": {
+          "200": {
+            "description": "成功更新購物車狀態(結帳)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "購物車狀態更新成功"
                     }
                   }
                 }
