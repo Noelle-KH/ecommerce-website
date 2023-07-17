@@ -1,11 +1,13 @@
 <script setup>
 import { reactive, ref, watch } from 'vue'
 import Swal from 'sweetalert2'
-import { login } from '../../composable/api/useAuthApi'
+import useApi from '../../composable/useApi'
+import useFormValidation from '../../composable/useFormValidation'
 
 const emits = defineEmits(['closeModal', 'authenticate'])
+const { login } = useApi()
 
-const title = ref('會員')
+const loginType = ref('會員')
 const formData = reactive({
   account: '',
   password: ''
@@ -15,12 +17,8 @@ const formError = reactive({
   password: null
 })
 const errorMessage = ref(null)
-
-const clearError = () => {
-  formError.account = null
-  formError.password = null
-  errorMessage.value = null
-}
+const { validationRules, fieldValidation, clearError, validFieldForm } =
+  useFormValidation(formData, formError, errorMessage)
 
 watch([formError, errorMessage], () => {
   const timer = setTimeout(clearError, 2000)
@@ -28,7 +26,9 @@ watch([formError, errorMessage], () => {
 })
 
 const handleChangeTitle = () => {
-  title.value === '會員' ? (title.value = '商家') : (title.value = '會員')
+  loginType.value === '會員'
+    ? (loginType.value = '商家')
+    : (loginType.value = '會員')
 }
 
 const handleCloseModal = () => {
@@ -38,17 +38,13 @@ const handleCloseModal = () => {
 const handleSubmit = async () => {
   clearError()
 
-  if (!formData.account) {
-    formError.account = '帳號不得為空'
-  }
+  fieldValidation(validationRules('account'), 'account')
+  fieldValidation(validationRules('password'), 'password')
 
-  if (!formData.password) {
-    formError.password = '密碼不得為空'
-  }
-
-  if (!formError.account && !formError.password) {
+  const validForm = validFieldForm()
+  if (validForm) {
     try {
-      const role = title.value === '會員' ? 'buyer' : 'seller'
+      const role = loginType.value === '會員' ? 'buyer' : 'seller'
       const { user, token, message, code } = await login(
         role,
         formData.account,
@@ -101,9 +97,9 @@ const handleSubmit = async () => {
       </p>
       <h2
         class="pb-6 text-center text-2xl"
-        :class="[title === '會員' ? 'text-orange-400' : 'text-sky-400']"
+        :class="[loginType === '會員' ? 'text-orange-400' : 'text-sky-400']"
       >
-        {{ title }}登入
+        {{ loginType }}登入
       </h2>
 
       <div>
@@ -147,7 +143,7 @@ const handleSubmit = async () => {
       <button
         class="w-full rounded-sm border py-1"
         :class="[
-          title === '會員'
+          loginType === '會員'
             ? 'bg-orange-400 hover:bg-orange-300'
             : 'bg-sky-400 hover:bg-sky-300'
         ]"
@@ -159,13 +155,13 @@ const handleSubmit = async () => {
         <span
           class="cursor-pointer tracking-widest text-sky-400 underline hover:text-sky-500"
           :class="[
-            title === '會員'
+            loginType === '會員'
               ? 'text-sky-400 hover:text-sky-500'
               : 'text-orange-400 hover:text-orange-500'
           ]"
           @click="handleChangeTitle"
         >
-          {{ title === '會員' ? '商家' : '會員' }}登入
+          {{ loginType === '會員' ? '商家' : '會員' }}登入
         </span>
       </p>
     </form>
