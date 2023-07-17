@@ -4,10 +4,11 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import CartList from '../components/Cart/CartList.vue'
 import LoadAnimation from '../components/LoadAnimation.vue'
-import { getCartItems } from '../composable/api/useCartApi'
+import useApi from '../composable/useApi'
 
 const props = defineProps(['isAuthenticate', 'role'])
 const router = useRouter()
+const { getCartItems } = useApi()
 
 const cartItems = ref([])
 const isLoading = ref(false)

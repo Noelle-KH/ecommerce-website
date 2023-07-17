@@ -4,10 +4,11 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AddItemModal from '../components/Store/AddItemModal.vue'
 import StoreList from '../components/Store/StoreList.vue'
-import { getAllProduct } from '../composable/api/useProductApi'
+import useApi from '../composable/useApi'
 
 const props = defineProps(['isAuthenticate', 'role'])
 const router = useRouter()
+const { getAllProduct } = useApi()
 
 const showAddItemModal = ref(false)
 const activeProducts = ref([])

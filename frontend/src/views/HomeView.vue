@@ -4,9 +4,10 @@ import HeroSection from '../components/Home/HeroSection.vue'
 import SideBar from '../components/Home/SideBar.vue'
 import ProductList from '../components/Home/ProductList.vue'
 import LoadAnimation from '../components/LoadAnimation.vue'
-import { getAllProduct, getCategories } from '../composable/api/useProductApi'
+import useApi from '../composable/useApi'
 
 const props = defineProps(['isAuthenticate', 'role', 'keyword'])
+const { getAllProduct, getCategories } = useApi()
 
 const products = ref([])
 const categories = ref([])
@@ -38,7 +39,7 @@ watch(
 const handleSearchResult = async (filterQuery) => {
   try {
     isLoading.value = true
-    const data = await getAllProduct(filterQuery)
+    const data = await getAllProduct(true, filterQuery)
     searchResult.value = data.products
   } catch (error) {
     errorMessage.value = error.message
