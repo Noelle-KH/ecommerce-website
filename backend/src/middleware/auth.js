@@ -26,9 +26,9 @@ const verifyToken = (req, res, next) => {
 
 const verifyRole = (role) => {
   return (req, res, next) => {
-    const userRole = req.user.role
+    const { user } = req
 
-    if (userRole !== role) {
+    if (user.role !== role) {
       return next(createError(403, '沒有使用該頁面的權限'))
     }
 

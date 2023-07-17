@@ -13,7 +13,7 @@ const authController = {
       const query =
         role === 'buyer'
           ? {
-              where: { account },
+              where: { account, role },
               include: {
                 cart: {
                   where: { checkout: false },
@@ -21,7 +21,7 @@ const authController = {
                 }
               }
             }
-          : { where: { account } }
+          : { where: { account, role } }
 
       const foundUser = await prisma.user.findFirst(query)
 
@@ -38,11 +38,13 @@ const authController = {
         role === 'buyer'
           ? {
               id: foundUser.id,
+              account: foundUser.account,
               role: foundUser.role,
               cartId: foundUser.cart[0].id
             }
           : {
               id: foundUser.id,
+              account: foundUser.account,
               role: foundUser.role
             }
 

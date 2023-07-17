@@ -7,9 +7,23 @@ const authController = {
     try {
       const active = req.query.active !== 'false'
       const { keyword, min, max, orderBy, categoryId } = req.query
+
       let filter = {
         where: { active },
-        include: { category: true },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          image: true,
+          price: true,
+          stock: true,
+          category: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        },
         orderBy: { createdAt: 'desc' }
       }
 
@@ -24,7 +38,8 @@ const authController = {
           where: {
             active,
             price: { lte: Number(max), gte: Number(min) }
-          }
+          },
+          orderBy: { price: 'desc' }
         }
       } else if (categoryId) {
         filter = {
@@ -65,6 +80,7 @@ const authController = {
         stock: Number(stock),
         categoryId
       }
+
       const product = await prisma.product.create({ data })
 
       res.json({
@@ -85,9 +101,11 @@ const authController = {
       const { name, description, price, stock, categoryId } = req.body
 
       const foundProduct = await prisma.product.findFirst({ where: { id } })
+
       if (!foundProduct) {
         throw createError(404, '該商品不存在')
       }
+
       const updateData = {
         name,
         description,
