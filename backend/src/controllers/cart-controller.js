@@ -6,11 +6,28 @@ const cartController = {
   getCartItems: async (req, res, next) => {
     try {
       const buyerId = req.user.id
+
       const cart = await prisma.cart.findFirst({
         where: { checkout: false, buyerId },
-        include: {
+        select: {
+          id: true,
           cartItem: {
-            include: { product: true }
+            select: {
+              id: true,
+              amount: true,
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                  image: true,
+                  price: true,
+                  stock: true
+                }
+              }
+            },
+            orderBy: {
+              createdAt: 'desc'
+            }
           }
         }
       })
@@ -30,71 +47,67 @@ const cartController = {
       const { cartId } = req.user
       const { productId } = req.body
 
-      const createCartItem = await prisma.$transaction(async (tx) => {
-        const checkProductStock = await tx.product.findFirst({
-          where: { id: productId, stock: { gte: 1 } }
-        })
+      let cartItem
 
-        if (!checkProductStock) {
-          throw createError(400, '該商品庫存不足')
-        }
-
-        let cartItem
-        const findCartItem = await tx.cartItem.findFirst({
-          where: { productId }
-        })
-
-        if (findCartItem) {
-          cartItem = await tx.cartItem.update({
-            where: { id: findCartItem.id },
-            include: { product: true },
-            data: { amount: { increment: 1 } }
-          })
-        } else {
-          cartItem = await tx.cartItem.create({
-            data: { cartId, productId, amount: 1 },
-            include: { product: true }
-          })
-        }
-
-        const modifyProductStock = await tx.product.update({
-          where: { id: productId },
-          data: { stock: { decrement: 1 } }
-        })
-
-        if (modifyProductStock.stock < 0) {
-          throw createError(400, '該商品庫存不足')
-        }
-
-        const { id, amount: itemAmount } = cartItem
-        const {
-          id: modifyProductId,
-          name,
-          description,
-          image,
-          price,
-          stock
-        } = modifyProductStock
-
-        return {
-          id,
-          amount: itemAmount,
-          product: {
-            id: modifyProductId,
-            name,
-            description,
-            image,
-            price,
-            stock
-          }
-        }
+      const foundProduct = await prisma.product.findFirst({
+        where: { id: productId },
+        select: { stock: true }
       })
+
+      const foundCartItem = await prisma.cartItem.findFirst({
+        where: { cartId, productId },
+        select: { id: true, amount: true }
+      })
+
+      if (
+        foundProduct.stock < 1 ||
+        (foundCartItem && foundCartItem.amount + 1 > foundProduct.stock)
+      ) {
+        throw createError(400, '該商品庫存不足')
+      }
+
+      if (foundCartItem) {
+        cartItem = await prisma.cartItem.update({
+          where: { id: foundCartItem.id },
+          data: { amount: { increment: 1 } },
+          select: {
+            id: true,
+            amount: true,
+            product: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+                price: true,
+                stock: true
+              }
+            }
+          }
+        })
+      } else {
+        cartItem = await prisma.cartItem.create({
+          data: { cartId, productId, amount: 1 },
+          select: {
+            id: true,
+            amount: true,
+            product: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+                price: true,
+                stock: true
+              }
+            }
+          }
+        })
+      }
 
       res.json({
         status: 'success',
         message: '新增購物車商品成功',
         data: {
-          cartItem: createCartItem
+          cartItem
         }
       })
     } catch (error) {
@@ -104,19 +117,23 @@ const cartController = {
   updateCartStatus: async (req, res, next) => {
     try {
       const buyerId = req.user.id
+
       const result = await prisma.$transaction(async (tx) => {
-        const cartId = await tx.cart.findFirst({
+        const foundCart = await tx.cart.findFirst({
           where: { checkout: false, buyerId },
           select: { id: true }
         })
 
-        if (!cartId) {
+        if (!foundCart) {
           throw createError(400, '該購物車不存在')
         }
 
         const cartItems = await tx.cartItem.findMany({
-          where: { cartId },
-          include: { product: true }
+          where: { cartId: foundCart.id },
+          select: {
+            amount: true,
+            product: { select: { id: true, stock: true } }
+          }
         })
 
         for (const cartItem of cartItems) {
@@ -125,21 +142,33 @@ const cartController = {
           if (product.stock < amount) {
             throw createError(400, '該商品庫存不足')
           }
+
+          await prisma.product.update({
+            where: { id: product.id },
+            data: { stock: { decrement: amount } },
+            select: { stock: true }
+          })
         }
 
-        await tx.cart.update(
-          { where: { id: cartId } },
-          { data: { checkout: true } }
-        )
-        await tx.cart.create({ buyerId })
+        await tx.cart.update({
+          where: { id: foundCart.id },
+          data: { checkout: true },
+          select: { checkout: true }
+        })
 
-        return true
+        const newCartId = await tx.cart.create({
+          data: { buyerId },
+          select: { id: true }
+        })
+
+        return newCartId
       })
 
       if (result) {
         res.json({
           status: 'success',
-          message: '購物車狀態更新成功'
+          message: '購物車狀態更新成功',
+          data: { cartId: result }
         })
       }
     } catch (error) {
@@ -148,74 +177,60 @@ const cartController = {
   },
   updateCartItem: async (req, res, next) => {
     try {
+      const { cartId } = req.user
       const { cartItemId } = req.params
       const { amount } = req.body
-      const result = await prisma.$transaction(async (tx) => {
-        const cartItem = await tx.cartItem.findFirst({
-          where: { id: cartItemId },
-          include: { product: true }
-        })
 
-        if (!cartItem) {
-          throw createError(404, '該購物車商品不存在')
+      const cartItem = await prisma.cartItem.findFirst({
+        where: { id: cartItemId, cartId },
+        select: {
+          id: true,
+          product: { select: { id: true, stock: true } }
         }
-
-        if (cartItem.product.stock < Number(amount)) {
-          throw createError(400, '該商品庫存不足')
-        }
-
-        await tx.cartItem.update({
-          where: { id: cartItem.id },
-          data: { amount: Number(amount) }
-        })
-
-        await tx.product.update({
-          where: { id: cartItem.product.id },
-          data: { stock: { decrement: Number(amount) - cartItem.amount } }
-        })
-
-        return true
       })
 
-      if (result) {
-        res.json({
-          status: 'success',
-          message: '購物車商品數量更新成功'
-        })
+      if (!cartItem) {
+        throw createError(404, '該購物車商品不存在')
       }
+
+      if (cartItem.product.stock < Number(amount)) {
+        throw createError(400, '該商品庫存不足')
+      }
+
+      await prisma.cartItem.update({
+        where: { id: cartItem.id },
+        data: { amount: Number(amount) },
+        select: { amount: true }
+      })
+
+      res.json({
+        status: 'success',
+        message: '購物車商品數量更新成功'
+      })
     } catch (error) {
       next(error)
     }
   },
   deleteCartItem: async (req, res, next) => {
     try {
+      const { cartId } = req.user
       const { cartItemId } = req.params
 
-      const result = await prisma.$transaction(async (tx) => {
-        const cartItem = await tx.cartItem.findFirst({
-          where: { id: cartItemId }
-        })
-
-        if (!cartItem) {
-          throw createError(404, '該購物車商品不存在')
-        }
-
-        await prisma.product.update({
-          where: { id: cartItem.productId },
-          data: { stock: { increment: cartItem.amount } }
-        })
-
-        await prisma.cartItem.delete({ where: { id: cartItem.id } })
-
-        return true
+      const cartItem = await prisma.cartItem.findFirst({
+        where: { id: cartItemId, cartId },
+        select: { id: true, amount: true, productId: true }
       })
 
-      if (result) {
-        res.json({
-          status: 'success',
-          message: '刪除購物車商品成功'
-        })
+      if (!cartItem) {
+        throw createError(404, '該購物車商品不存在')
       }
+
+      await prisma.cartItem.delete({ where: { id: cartItem.id } })
+
+      res.json({
+        status: 'success',
+        message: '刪除購物車商品成功'
+      })
     } catch (error) {
       next(error)
     }
