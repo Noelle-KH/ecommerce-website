@@ -2,11 +2,14 @@
 import Swal from 'sweetalert2'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useAuthStore } from '../stores/auth'
+import useApi from '../composable/useApi'
 import CartList from '../components/Cart/CartList.vue'
 import LoadAnimation from '../components/LoadAnimation.vue'
-import useApi from '../composable/useApi'
 
-const props = defineProps(['isAuthenticate', 'role'])
+const authStore = useAuthStore()
+const { isAuthenticate, role } = storeToRefs(authStore)
 const router = useRouter()
 const { getCartItems } = useApi()
 
@@ -16,7 +19,7 @@ const errorMessage = ref(null)
 
 onMounted(async () => {
   try {
-    if (!props.isAuthenticate || props.role !== 'buyer') {
+    if (!isAuthenticate.value || role.value !== 'buyer') {
       Swal.fire({
         icon: 'error',
         title: '沒有使用該頁面的權限'

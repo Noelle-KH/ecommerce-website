@@ -5,9 +5,13 @@ import Swal from 'sweetalert2'
 import SearchIcon from '../icons/SearchIcon.vue'
 import CartIcon from '../icons/CartIcon.vue'
 import StoreIcon from '../icons/StoreIcon.vue'
+import { useAuthStore } from '../../stores/auth'
+import { storeToRefs } from 'pinia'
 
-const emits = defineEmits(['openModal', 'nonAuthenticate', 'filterKeyword'])
-const props = defineProps(['isAuthenticate', 'role'])
+const authStore = useAuthStore()
+const { isAuthenticate, role } = storeToRefs(authStore)
+const { changeAuthenticateStatus } = authStore
+const emits = defineEmits(['openModal', 'filterKeyword'])
 const router = useRouter()
 
 const keyword = ref('')
@@ -17,7 +21,7 @@ const handleShowModal = () => {
 }
 
 const handleGetCart = () => {
-  if (!props.isAuthenticate) {
+  if (!isAuthenticate.value) {
     Swal.fire({
       icon: 'error',
       text: '請先註冊或登入才能使用功能'
@@ -38,7 +42,7 @@ const handleLogout = () => {
     icon: 'success',
     title: '登出成功'
   }).then(() => {
-    emits('nonAuthenticate', false)
+    changeAuthenticateStatus(false)
     router.replace({ name: 'HomeView' })
   })
 }

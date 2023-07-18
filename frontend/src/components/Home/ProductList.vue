@@ -1,7 +1,7 @@
 <script setup>
 import ProductItem from './ProductItem.vue'
 
-defineProps(['isAuthenticate', 'role', 'products'])
+defineProps(['products'])
 </script>
 
 <template>
@@ -18,8 +18,6 @@ defineProps(['isAuthenticate', 'role', 'products'])
       >
         <ProductItem
           :product="product"
-          :isAuthenticate="isAuthenticate"
-          :role="role"
         />
       </div>
     </div>

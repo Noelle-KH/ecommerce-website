@@ -1,12 +1,12 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
+import useApi from '../composable/useApi'
 import HeroSection from '../components/Home/HeroSection.vue'
 import SideBar from '../components/Home/SideBar.vue'
 import ProductList from '../components/Home/ProductList.vue'
 import LoadAnimation from '../components/LoadAnimation.vue'
-import useApi from '../composable/useApi'
 
-const props = defineProps(['isAuthenticate', 'role', 'keyword'])
+const props = defineProps(['keyword'])
 const { getAllProduct, getCategories } = useApi()
 
 const products = ref([])
@@ -60,8 +60,6 @@ const handleSearchResult = async (filterQuery) => {
       />
       <ProductList
         v-if="searchResult ? searchResult : products"
-        :isAuthenticate="isAuthenticate"
-        :role="role"
         :products="searchResult ? searchResult : products"
       />
       <LoadAnimation

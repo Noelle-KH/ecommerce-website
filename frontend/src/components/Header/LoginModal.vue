@@ -3,8 +3,11 @@ import { reactive, ref, watch } from 'vue'
 import Swal from 'sweetalert2'
 import useApi from '../../composable/useApi'
 import useFormValidation from '../../composable/useFormValidation'
+import { useAuthStore } from '../../stores/auth'
 
-const emits = defineEmits(['closeModal', 'authenticate'])
+const authStore = useAuthStore()
+const { changeAuthenticateStatus } = authStore
+const emits = defineEmits(['closeModal'])
 const { login } = useApi()
 
 const loginType = ref('會員')
@@ -71,7 +74,7 @@ const handleSubmit = async () => {
           title: message
         }).then(() => {
           emits('closeModal')
-          emits('authenticate', true)
+          changeAuthenticateStatus(true)
         })
       }
     } catch (error) {

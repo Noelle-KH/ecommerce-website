@@ -1,10 +1,14 @@
 <script setup>
 import Swal from 'sweetalert2'
-import { useRouter } from 'vue-router'
-import CartIcon from '../icons/CartIcon.vue'
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useAuthStore } from '../../stores/auth'
+import CartIcon from '../icons/CartIcon.vue'
 
-const props = defineProps(['product', 'isAuthenticate', 'role'])
+const authStore = useAuthStore()
+const { isAuthenticate, role } = storeToRefs(authStore)
+const props = defineProps(['product'])
 const router = useRouter()
 
 const formatName = computed(() => {
@@ -14,7 +18,7 @@ const formatName = computed(() => {
 })
 
 const handleGetCart = () => {
-  if (!props.isAuthenticate) {
+  if (!isAuthenticate.value) {
     Swal.fire({
       icon: 'error',
       text: '請先註冊或登入才能使用功能'

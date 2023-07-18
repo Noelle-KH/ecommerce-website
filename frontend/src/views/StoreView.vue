@@ -1,13 +1,21 @@
 <script setup>
 import Swal from 'sweetalert2'
-import { onMounted, ref } from 'vue'
+import { defineAsyncComponent, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import AddItemModal from '../components/Store/AddItemModal.vue'
-import StoreList from '../components/Store/StoreList.vue'
+import { storeToRefs } from 'pinia'
+import { useAuthStore } from '../stores/auth'
 import useApi from '../composable/useApi'
 
-const props = defineProps(['isAuthenticate', 'role'])
+const AddItemModal = defineAsyncComponent(() =>
+  import('../components/Store/AddItemModal.vue')
+)
+const StoreList = defineAsyncComponent(() =>
+  import('../components/Store/StoreList.vue')
+)
+
 const router = useRouter()
+const authStore = useAuthStore()
+const { isAuthenticate, role } = storeToRefs(authStore)
 const { getAllProduct } = useApi()
 
 const showAddItemModal = ref(false)
@@ -18,7 +26,7 @@ const errorMessage = ref(null)
 
 onMounted(async () => {
   try {
-    if (!props.isAuthenticate || props.role !== 'seller') {
+    if (!isAuthenticate.value || role.value !== 'seller') {
       Swal.fire({
         icon: 'error',
         title: '沒有使用該頁面的權限'
@@ -28,7 +36,7 @@ onMounted(async () => {
 
     isLoading.value = true
     const activeData = await getAllProduct()
-    const nonActiveData = await getAllProduct('', false)
+    const nonActiveData = await getAllProduct(false)
     activeProducts.value = activeData.products
     nonActiveProducts.value = nonActiveData.products
   } catch (error) {
@@ -49,8 +57,6 @@ const toggleProductData = (id, originPosition, newPosition) => {
       product.id === id ? { ...product, active: !product.active } : product
     )
     .filter((product) => product.id !== id)
-
-  console.log(originPosition.value)
 
   newPosition.value = [
     ...newPosition.value,
