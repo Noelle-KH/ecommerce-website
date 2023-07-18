@@ -16,6 +16,15 @@ const useApi = () => {
     }
   }
 
+  const getCategories = async () => {
+    try {
+      const response = await axiosInstance.get('/categories')
+      return response.data.data
+    } catch (error) {
+      throw error.response.data
+    }
+  }
+
   const getAllProduct = async (active = true, filter = '') => {
     try {
       let query = ''
@@ -39,26 +48,7 @@ const useApi = () => {
     }
   }
 
-  const getCategories = async () => {
-    try {
-      const response = await axiosInstance.get('/categories')
-      return response.data.data
-    } catch (error) {
-      throw error.response.data
-    }
-  }
-
-  const getCartItems = async () => {
-    try {
-      const response = await axiosAuthInstance.get('/carts')
-
-      return response.data.data
-    } catch (error) {
-      throw error.response.data
-    }
-  }
-
-  const addProduct = async (product) => {
+  const addStoreProduct = async (product) => {
     try {
       const response = await axiosAuthInstance.post(
         '/products',
@@ -77,7 +67,47 @@ const useApi = () => {
     }
   }
 
-  return { login, getAllProduct, addProduct, getCartItems, getCategories }
+  const updateProductStatus = async (id, active) => {
+    try {
+      const response = await axiosAuthInstance.patch(
+        `/products/${id}?active=${active}`
+      )
+
+      return response.data.message
+    } catch (error) {
+      throw error.response.data
+    }
+  }
+
+  const deleteStoreProduct = async (id) => {
+    try {
+      const response = await axiosAuthInstance.delete(`/products/${id}`)
+
+      return response.data.message
+    } catch (error) {
+      throw error.response.data
+    }
+  }
+
+  const getCartItems = async () => {
+    try {
+      const response = await axiosAuthInstance.get('/carts')
+
+      return response.data.data
+    } catch (error) {
+      throw error.response.data
+    }
+  }
+
+  return {
+    login,
+    getCategories,
+    getAllProduct,
+    addStoreProduct,
+    updateProductStatus,
+    deleteStoreProduct,
+    getCartItems
+  }
 }
 
 export default useApi

@@ -3,9 +3,11 @@ import Swal from 'sweetalert2'
 import DeleteIcon from '../icons/DeleteIcon.vue'
 import PutOnIcon from '../icons/PutOnIcon.vue'
 import TackOffIcon from '../icons/TackOffIcon.vue'
+import { useStoreStore } from '../../stores/store'
 
-const props = defineProps(['active', 'product'])
-const emits = defineEmits(['toggleActive', 'deleteProduct'])
+const storeStore = useStoreStore()
+const { toggleActive, deleteProduct } = storeStore
+defineProps(['active', 'product'])
 
 const handleDeleteProduct = (id) => {
   Swal.fire({
@@ -16,14 +18,10 @@ const handleDeleteProduct = (id) => {
     cancelButtonText: '取消'
   }).then((result) => {
     if (result.isConfirmed) {
-      return emits('deleteProduct', id)
+      return deleteProduct(id)
     }
     return
   })
-}
-
-const handleToggleActive = (id) => {
-  emits('toggleActive', id, props.active)
 }
 </script>
 
@@ -38,7 +36,7 @@ const handleToggleActive = (id) => {
       <TackOffIcon
         v-if="active"
         class="mx-auto h-5 w-5 cursor-pointer hover:text-stone-600"
-        @click="handleToggleActive(product.id)"
+        @click="toggleActive(product.id, active)"
       />
     </td>
     <td>
@@ -52,7 +50,7 @@ const handleToggleActive = (id) => {
       <PutOnIcon
         v-if="!active"
         class="mx-auto h-5 w-5 cursor-pointer"
-        @click="handleToggleActive(product.id)"
+        @click="toggleActive(product.id, active)"
       />
       <span v-else>更新</span>
     </td>

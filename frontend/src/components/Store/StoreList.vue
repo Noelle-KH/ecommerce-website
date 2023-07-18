@@ -1,35 +1,19 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useStoreStore } from '../../stores/store'
 import StoreItem from './StoreItem.vue'
 import PutOnIcon from '../icons/PutOnIcon.vue'
 import TackOffIcon from '../icons/TackOffIcon.vue'
 
-const props = defineProps(['active', 'productsData'])
-const emits = defineEmits(['openModal', 'toggleActive', 'deleteProduct'])
+const storeStore = useStoreStore()
+const { activeProducts, nonActiveProducts } = storeToRefs(storeStore)
+const { toggleModal } = storeStore
 
-const products = ref(props.productsData)
-
+const props = defineProps(['active'])
+const products = ref(props.active ? activeProducts : nonActiveProducts)
 const title = props.active ? '上架' : '下架'
 const tableHeader = props.active ? '下架' : '刪除'
-
-watch(
-  () => props.productsData,
-  (newProducts) => {
-    products.value = newProducts
-  }
-)
-
-const handleOpenModal = () => {
-  emits('openModal', true)
-}
-
-const handleToggleActive = (id, active) => {
-  emits('toggleActive', id, active)
-}
-
-const handleDeleteProduct = (id) => {
-  emits('deleteProduct', id)
-}
 </script>
 
 <template>
@@ -44,7 +28,7 @@ const handleDeleteProduct = (id) => {
       <button
         v-if="active"
         class="absolute right-0 top-[-18%] rounded-md border bg-orange-400 px-8 py-3 text-sm font-bold hover:bg-orange-300"
-        @click="handleOpenModal"
+        @click="toggleModal()"
       >
         新增上架商品
       </button>
@@ -61,14 +45,17 @@ const handleDeleteProduct = (id) => {
           <th>{{ active ? '更新' : '上架' }}商品</th>
         </tr>
       </thead>
-      <tbody v-for="product in products" :key="product.id">
+      <tbody v-if="products.length">
         <StoreItem
+          v-for="product in products"
+          :key="product.id"
           :active="active"
           :product="product"
-          @deleteProduct="handleDeleteProduct"
-          @toggleActive="handleToggleActive"
         />
       </tbody>
     </table>
+    <p v-if="!products.length" class="mt-2 text-center text-lg">
+      沒有{{ title }}商品
+    </p>
   </section>
 </template>

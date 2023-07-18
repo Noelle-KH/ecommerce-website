@@ -1,11 +1,13 @@
 <script setup>
+import Swal from 'sweetalert2'
 import { onMounted, reactive, ref, watch } from 'vue'
 import useApi from '../../composable/useApi'
 import useFormValidation from '../../composable/useFormValidation'
-import Swal from 'sweetalert2'
+import { useStoreStore } from '../../stores/store'
 
-const emits = defineEmits(['closeModal', 'addProductItem'])
-const { getCategories, addProduct } = useApi()
+const storeStore = useStoreStore()
+const { addNewProduct, toggleModal } = storeStore
+const { getCategories, addStoreProduct } = useApi()
 
 const categories = ref([])
 const formData = reactive({
@@ -39,10 +41,6 @@ watch([formError, errorMessage], () => {
   return () => clearTimeout(timer)
 })
 
-const handleCloseModal = () => {
-  emits('closeModal', false)
-}
-
 const handleFileChange = (event) => {
   formData.image = event.target.files[0]
 }
@@ -57,14 +55,14 @@ const handleSubmit = async () => {
   const validForm = validFieldForm()
   if (validForm) {
     try {
-      const { product, message } = await addProduct(formData)
+      const { product, message } = await addStoreProduct(formData)
       if (product) {
         Swal.fire({
           icon: 'success',
           title: message
         }).then(() => {
-          emits('addProductItem', product)
-          emits('closeModal', false)
+          addNewProduct(product)
+          toggleModal()
         })
       }
     } catch (error) {
@@ -89,7 +87,7 @@ const handleSubmit = async () => {
 <template>
   <div
     class="fixed left-0 top-0 z-10 flex h-full w-full items-center justify-center bg-black bg-opacity-80"
-    @click.self="handleCloseModal"
+    @click.self="toggleModal()"
   >
     <form
       class="relative max-h-[90vh] overflow-y-scroll rounded-md bg-white p-12"

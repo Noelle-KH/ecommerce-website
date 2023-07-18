@@ -1,10 +1,10 @@
 <script setup>
 import Swal from 'sweetalert2'
-import { defineAsyncComponent, onMounted, ref } from 'vue'
+import { defineAsyncComponent, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth'
-import useApi from '../composable/useApi'
+import { useStoreStore } from '../stores/store'
 
 const AddItemModal = defineAsyncComponent(() =>
   import('../components/Store/AddItemModal.vue')
@@ -15,99 +15,34 @@ const StoreList = defineAsyncComponent(() =>
 
 const router = useRouter()
 const authStore = useAuthStore()
+const storeStore = useStoreStore()
 const { isAuthenticate, role } = storeToRefs(authStore)
-const { getAllProduct } = useApi()
-
-const showAddItemModal = ref(false)
-const activeProducts = ref([])
-const nonActiveProducts = ref([])
-const isLoading = ref(false)
-const errorMessage = ref(null)
+const { showAddItemModal, errorMessage } = storeToRefs(storeStore)
+const { getStoreProducts } = storeStore
 
 onMounted(async () => {
-  try {
-    if (!isAuthenticate.value || role.value !== 'seller') {
-      Swal.fire({
-        icon: 'error',
-        title: '沒有使用該頁面的權限'
-      })
-      return router.replace({ name: 'HomeView' })
-    }
-
-    isLoading.value = true
-    const activeData = await getAllProduct()
-    const nonActiveData = await getAllProduct(false)
-    activeProducts.value = activeData.products
-    nonActiveProducts.value = nonActiveData.products
-  } catch (error) {
-    errorMessage.value = error.message
-  } finally {
-    isLoading.value = false
+  if (!isAuthenticate.value || role.value !== 'seller') {
+    Swal.fire({
+      icon: 'error',
+      title: !isAuthenticate.value
+        ? '請先註冊或登入才能使用功能'
+        : '沒有使用該頁面的權限'
+    })
+    return router.replace({ name: 'HomeView' })
   }
+
+  await getStoreProducts()
+  await getStoreProducts(false)
 })
-
-const handleShowModal = (type) => {
-  showAddItemModal.value = type
-}
-
-const toggleProductData = (id, originPosition, newPosition) => {
-  const product = originPosition.value.find((product) => product.id === id)
-  originPosition.value = originPosition.value
-    .map((product) =>
-      product.id === id ? { ...product, active: !product.active } : product
-    )
-    .filter((product) => product.id !== id)
-
-  newPosition.value = [
-    ...newPosition.value,
-    { ...product, active: !product.active }
-  ]
-}
-
-const handleToggleActive = (id, active) => {
-  if (active) {
-    toggleProductData(id, activeProducts, nonActiveProducts)
-  } else {
-    toggleProductData(id, nonActiveProducts, activeProducts)
-  }
-}
-
-const handleAddProduct = (product) => {
-  activeProducts.value = [product, ...activeProducts.value]
-}
-
-const handleDeleteProduct = (id) => {
-  nonActiveProducts.value = nonActiveProducts.value.filter(
-    (product) => product.id !== id
-  )
-}
 </script>
 
 <template>
   <main class="px-10 py-12">
-    <p v-if="errorMessage">{{ errorMessage }}</p>
-    <p v-if="isLoading && !errorMessage">loading</p>
-    <div
-      v-if="Array.isArray(activeProducts) && Array.isArray(nonActiveProducts)"
-    >
-      <AddItemModal
-        v-if="showAddItemModal"
-        @closeModal="handleShowModal"
-        @addProductItem="handleAddProduct"
-      />
-      <StoreList
-        :active="true"
-        :productsData="activeProducts"
-        @openModal="handleShowModal"
-        @toggleActive="handleToggleActive"
-        @deleteProduct="handleDeleteProduct"
-      />
-      <StoreList
-        :active="false"
-        :productsData="nonActiveProducts"
-        @toggleActive="handleToggleActive"
-        @deleteProduct="handleDeleteProduct"
-      />
-    </div>
+    <p v-if="errorMessage" class="text-center text-red-500">
+      {{ errorMessage }}
+    </p>
+    <AddItemModal v-if="showAddItemModal" />
+    <StoreList :active="true" />
+    <StoreList :active="false" />
   </main>
 </template>
