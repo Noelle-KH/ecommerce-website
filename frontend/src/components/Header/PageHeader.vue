@@ -1,24 +1,22 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter, RouterLink } from 'vue-router'
 import Swal from 'sweetalert2'
+import { ref } from 'vue'
+import { useRouter, useRoute, RouterLink } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useAuthStore } from '../../stores/auth'
 import SearchIcon from '../icons/SearchIcon.vue'
 import CartIcon from '../icons/CartIcon.vue'
 import StoreIcon from '../icons/StoreIcon.vue'
-import { useAuthStore } from '../../stores/auth'
-import { storeToRefs } from 'pinia'
 
-const authStore = useAuthStore()
-const { isAuthenticate, role } = storeToRefs(authStore)
-const { changeAuthenticateStatus } = authStore
-const emits = defineEmits(['openModal', 'filterKeyword'])
 const router = useRouter()
+const route = useRoute()
+const authStore = useAuthStore()
+const { isAuthenticate,  user } = storeToRefs(authStore)
+const { toggleModal } = authStore
+const { changeAuthenticateStatus } = authStore
+const emits = defineEmits(['filterKeyword'])
 
 const keyword = ref('')
-
-const handleShowModal = () => {
-  emits('openModal')
-}
 
 const handleGetCart = () => {
   if (!isAuthenticate.value) {
@@ -87,10 +85,15 @@ const handleLogout = () => {
       </div>
       <div class="flex items-center gap-5">
         <RouterLink
-          :to="role === 'seller' ? { name: 'StoreView' } : { name: 'CartView' }"
+          v-if="route.path === '/'"
+          :to="
+            user?.role === 'seller'
+              ? { name: 'StoreView' }
+              : { name: 'CartView' }
+          "
         >
           <StoreIcon
-            v-if="role === 'seller'"
+            v-if="user?.role === 'seller'"
             class="w-8 cursor-pointer hover:text-stone-600"
           />
           <CartIcon
@@ -99,10 +102,15 @@ const handleLogout = () => {
             @click="handleGetCart"
           />
         </RouterLink>
-
+        <p v-else class="text-sm font-bold">{{ user?.account }}</p>
         <button
-          class="rounded-md bg-orange-400 px-8 py-2 hover:bg-orange-300"
-          @click="isAuthenticate ? handleLogout() : handleShowModal()"
+          class="rounded-md px-8 py-2"
+          :class="
+            user?.role === 'seller'
+              ? 'bg-sky-400 hover:bg-sky-300  '
+              : 'bg-orange-400 hover:bg-orange-300'
+          "
+          @click="isAuthenticate ? handleLogout() : toggleModal()"
         >
           {{ isAuthenticate ? '登出' : '登入' }}
         </button>

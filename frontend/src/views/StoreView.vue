@@ -16,12 +16,12 @@ const StoreList = defineAsyncComponent(() =>
 const router = useRouter()
 const authStore = useAuthStore()
 const storeStore = useStoreStore()
-const { isAuthenticate, role } = storeToRefs(authStore)
+const { isAuthenticate, user } = storeToRefs(authStore)
 const { showAddItemModal, errorMessage } = storeToRefs(storeStore)
 const { getStoreProducts } = storeStore
 
 onMounted(async () => {
-  if (!isAuthenticate.value || role.value !== 'seller') {
+  if (!isAuthenticate.value || user.value?.role !== 'seller') {
     Swal.fire({
       icon: 'error',
       title: !isAuthenticate.value

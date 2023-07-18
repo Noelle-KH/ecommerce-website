@@ -6,8 +6,7 @@ import useFormValidation from '../../composable/useFormValidation'
 import { useAuthStore } from '../../stores/auth'
 
 const authStore = useAuthStore()
-const { changeAuthenticateStatus } = authStore
-const emits = defineEmits(['closeModal'])
+const { changeAuthenticateStatus, toggleModal } = authStore
 const { login } = useApi()
 
 const loginType = ref('會員')
@@ -37,10 +36,6 @@ const handleChangeTitle = () => {
     : (loginType.value = '會員')
 }
 
-const handleCloseModal = () => {
-  emits('closeModal')
-}
-
 const handleSubmit = async () => {
   clearError()
 
@@ -65,8 +60,8 @@ const handleSubmit = async () => {
           icon: 'success',
           title: message
         }).then(() => {
-          emits('closeModal')
           changeAuthenticateStatus(true)
+          toggleModal()
         })
       }
     } catch (error) {
@@ -86,7 +81,7 @@ const handleSubmit = async () => {
 <template>
   <div
     class="fixed left-0 top-0 z-10 flex h-full w-full items-center justify-center bg-black bg-opacity-80"
-    @click.self="handleCloseModal"
+    @click.self="toggleModal"
   >
     <form
       class="relative rounded-md bg-white p-12"

@@ -9,7 +9,7 @@ import CartList from '../components/Cart/CartList.vue'
 import LoadAnimation from '../components/LoadAnimation.vue'
 
 const authStore = useAuthStore()
-const { isAuthenticate, role } = storeToRefs(authStore)
+const { isAuthenticate, user } = storeToRefs(authStore)
 const router = useRouter()
 const { getCartItems } = useApi()
 
@@ -19,7 +19,7 @@ const errorMessage = ref(null)
 
 onMounted(async () => {
   try {
-    if (!isAuthenticate.value || role.value !== 'buyer') {
+    if (!isAuthenticate.value || user.value?.role !== 'buyer') {
       Swal.fire({
         icon: 'error',
         title: '沒有使用該頁面的權限'

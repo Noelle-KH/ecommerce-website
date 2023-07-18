@@ -7,7 +7,7 @@ import { useAuthStore } from '../../stores/auth'
 import CartIcon from '../icons/CartIcon.vue'
 
 const authStore = useAuthStore()
-const { isAuthenticate, role } = storeToRefs(authStore)
+const { isAuthenticate, user } = storeToRefs(authStore)
 const props = defineProps(['product'])
 const router = useRouter()
 
@@ -41,7 +41,7 @@ const handleGetCart = () => {
 
     <p class="flex items-center justify-end gap-3">
       <CartIcon
-        v-show="role !== 'seller'"
+        v-show="user?.role !== 'seller'"
         class="h-6 w-6 cursor-pointer text-orange-400 hover:text-orange-500"
         @click="handleGetCart"
       />

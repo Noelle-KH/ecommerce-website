@@ -3,16 +3,27 @@ import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticate = ref(localStorage.getItem('token') !== null)
-  const role = ref(JSON.parse(localStorage.getItem('user'))?.role)
+  const user = ref(JSON.parse(localStorage.getItem('user')) || null)
+  const showLoginModal = ref(false)
 
   const changeAuthenticateStatus = (status) => {
     isAuthenticate.value = status
     if (status) {
-      role.value = JSON.parse(localStorage.getItem('user')).role
+      user.value = JSON.parse(localStorage.getItem('user'))
     } else {
-      role.value = null
+      user.value = null
     }
   }
 
-  return { isAuthenticate, role, changeAuthenticateStatus }
+  const toggleModal = () => {
+    showLoginModal.value = !showLoginModal.value
+  }
+
+  return {
+    isAuthenticate,
+    user,
+    showLoginModal,
+    changeAuthenticateStatus,
+    toggleModal
+  }
 })
