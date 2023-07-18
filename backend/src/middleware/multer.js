@@ -19,13 +19,13 @@ const storage = new CloudinaryStorage({
 const fileFilter = (req, file, cb) => {
   const fileType = file.mimetype.split('/')
   if (!(fileType[0] === 'image' && fileType[1] !== 'svg+xml')) {
-    return cb(createError(400, '請提供 jpg 或 png 圖檔', { code: 4005 }))
+    return cb(createError(400, '請提供jpg或png圖檔', { code: 4005 }))
   }
 
   cb(null, true)
 }
 
-const fileSize = 20 * 1024 * 1024
+const fileSize = 10 * 1024 * 1024
 
 const upload = multer({
   storage,

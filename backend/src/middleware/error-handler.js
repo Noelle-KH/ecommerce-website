@@ -1,19 +1,27 @@
 const errorHandler = (error, req, res, next) => {
-  const code = error.code || 5000
-  const statusCode = error.statusCode || 500
+  let statusCode = error.statusCode || 500
+  let code = error.code || 5000
+  let message = error.message
+
+  if (error.code === 'LIMIT_FILE_SIZE') {
+    statusCode = 400
+    code = 4005
+    message = '檔案超過限制大小'
+  }
+
   const status = statusCode.toString().startsWith('4') ? 'fail' : 'error'
 
   if (process.env.NODE_ENV === 'production') {
     res.status(statusCode).json({
       status,
       code,
-      message: error.message
+      message
     })
   } else {
     res.status(statusCode).json({
       status,
       code,
-      message: error.message,
+      message,
       stack: error.stack
     })
   }
