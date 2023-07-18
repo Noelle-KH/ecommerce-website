@@ -2,9 +2,10 @@
 import { onMounted, reactive, ref, watch } from 'vue'
 import useApi from '../../composable/useApi'
 import useFormValidation from '../../composable/useFormValidation'
+import Swal from 'sweetalert2'
 
-const emits = defineEmits(['closeModal'])
-const { getCategories } = useApi()
+const emits = defineEmits(['closeModal', 'addProductItem'])
+const { getCategories, addProduct } = useApi()
 
 const categories = ref([])
 const formData = reactive({
@@ -46,7 +47,7 @@ const handleFileChange = (event) => {
   formData.image = event.target.files[0]
 }
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   clearError()
 
   Object.keys(formData).forEach((fieldName) =>
@@ -55,7 +56,32 @@ const handleSubmit = () => {
 
   const validForm = validFieldForm()
   if (validForm) {
-    console.log(formData)
+    try {
+      const { product, message } = await addProduct(formData)
+      if (product) {
+        Swal.fire({
+          icon: 'success',
+          title: message
+        }).then(() => {
+          emits('addProductItem', product)
+          emits('closeModal', false)
+        })
+      }
+    } catch (error) {
+      if (error.code === 4003) {
+        formError.name = error.message
+      } else if (error.code === 4004) {
+        formError.name = error.message
+      } else if (error.code === 4005) {
+        formError.image = error.message
+      } else if (error.code === 4006) {
+        formError.price = error.message
+      } else if (error.code === 4007) {
+        formError.stock = error.message
+      } else {
+        errorMessage.value = error.message
+      }
+    }
   }
 }
 </script>
@@ -172,13 +198,19 @@ const handleSubmit = () => {
           </label>
           <input
             type="number"
-            class="mb-12 mt-2 w-full rounded-sm border px-2 py-1 sm:block"
-            :class="[formError.stock ? 'border-red-400' : 'border-stone-400']"
+            class="mt-2 w-full rounded-sm border px-2 py-1 sm:block"
+            :class="[
+              formError.stock ? 'border-red-400' : 'border-stone-400',
+              errorMessage ? 'mb-4' : 'mb-12'
+            ]"
             placeholder="請輸入商品庫存"
             v-model="formData.stock"
           />
         </div>
       </div>
+      <p v-if="errorMessage" class="mb-4 text-center text-xs text-red-500">
+        {{ errorMessage }}
+      </p>
       <button class="w-full rounded-sm border bg-sky-300 py-1 hover:bg-sky-200">
         新增商品
       </button>

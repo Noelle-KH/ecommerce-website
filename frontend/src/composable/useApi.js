@@ -12,7 +12,7 @@ const useApi = () => {
 
       return { ...response.data.data, message }
     } catch (error) {
-      return error.response.data
+      throw error.response.data
     }
   }
 
@@ -35,7 +35,7 @@ const useApi = () => {
 
       return response.data.data
     } catch (error) {
-      return error.response.data
+      throw error.response.data
     }
   }
 
@@ -44,7 +44,7 @@ const useApi = () => {
       const response = await axiosInstance.get('/categories')
       return response.data.data
     } catch (error) {
-      return error.response.data
+      throw error.response.data
     }
   }
 
@@ -54,11 +54,30 @@ const useApi = () => {
 
       return response.data.data
     } catch (error) {
-      return error.response.data
+      throw error.response.data
     }
   }
 
-  return { login, getAllProduct, getCartItems, getCategories }
+  const addProduct = async (product) => {
+    try {
+      const response = await axiosAuthInstance.post(
+        '/products',
+        { ...product },
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      )
+      const { message } = response.data
+
+      return { ...response.data.data, message }
+    } catch (error) {
+      throw error.response.data
+    }
+  }
+
+  return { login, getAllProduct, addProduct, getCartItems, getCategories }
 }
 
 export default useApi

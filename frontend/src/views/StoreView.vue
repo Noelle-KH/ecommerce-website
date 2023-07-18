@@ -72,6 +72,10 @@ const handleToggleActive = (id, active) => {
   }
 }
 
+const handleAddProduct = (product) => {
+  activeProducts.value = [product, ...activeProducts.value]
+}
+
 const handleDeleteProduct = (id) => {
   nonActiveProducts.value = nonActiveProducts.value.filter(
     (product) => product.id !== id
@@ -86,7 +90,11 @@ const handleDeleteProduct = (id) => {
     <div
       v-if="Array.isArray(activeProducts) && Array.isArray(nonActiveProducts)"
     >
-      <AddItemModal v-if="showAddItemModal" @closeModal="handleShowModal" />
+      <AddItemModal
+        v-if="showAddItemModal"
+        @closeModal="handleShowModal"
+        @addProductItem="handleAddProduct"
+      />
       <StoreList
         :active="true"
         :productsData="activeProducts"

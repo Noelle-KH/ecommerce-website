@@ -29,6 +29,9 @@ watch([formError, errorMessage], () => {
 })
 
 const handleChangeTitle = () => {
+  formData.account = ''
+  formData.password = ''
+
   loginType.value === '會員'
     ? (loginType.value = '商家')
     : (loginType.value = '會員')
@@ -48,22 +51,11 @@ const handleSubmit = async () => {
   if (validForm) {
     try {
       const role = loginType.value === '會員' ? 'buyer' : 'seller'
-      const { user, token, message, code } = await login(
+      const { user, token, message } = await login(
         role,
         formData.account,
         formData.password
       )
-
-      if (!user && !token) {
-        if (code === 4001) {
-          formError.account = message
-        } else if (code === 4002) {
-          formError.account = message
-          formError.password = message
-        } else {
-          errorMessage.value = message
-        }
-      }
 
       if (user && token) {
         localStorage.setItem('user', JSON.stringify(user))
@@ -78,7 +70,14 @@ const handleSubmit = async () => {
         })
       }
     } catch (error) {
-      console.error(error)
+      if (error.code === 4001) {
+        formError.account = error.message
+      } else if (error.code === 4002) {
+        formError.account = error.message
+        formError.password = error.message
+      } else {
+        errorMessage.value = error.message
+      }
     }
   }
 }
