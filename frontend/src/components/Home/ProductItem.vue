@@ -31,7 +31,8 @@ const handleGetCart = () => {
 
 <template>
   <img
-    class="cursor-pointer object-cover hover:opacity-80"
+    class="object-cover"
+    :class="[product.stock !== 0 ? 'cursor-pointer hover:opacity-80' : '']"
     :src="product.image"
     :alt="product.name"
   />
@@ -41,11 +42,13 @@ const handleGetCart = () => {
 
     <p class="flex items-center justify-end gap-3">
       <CartIcon
-        v-show="user?.role !== 'seller'"
+        v-show="user?.role !== 'seller' && product.stock !== 0"
         class="h-6 w-6 cursor-pointer text-orange-400 hover:text-orange-500"
         @click="handleGetCart"
       />
-      <span class="text-sm text-stone-500">還剩 {{ product.stock }} 件</span>
+      <span class="text-sm text-stone-500">{{
+        product.stock !== 0 ? `還剩 ${product.stock} 件` : '售完'
+      }}</span>
     </p>
   </div>
 </template>

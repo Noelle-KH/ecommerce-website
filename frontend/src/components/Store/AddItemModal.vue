@@ -1,15 +1,19 @@
 <script setup>
 import Swal from 'sweetalert2'
 import { onMounted, reactive, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useStoreStore } from '../../stores/store'
+import { useProductStore } from '../../stores/product'
 import useApi from '../../composable/useApi'
 import useFormValidation from '../../composable/useFormValidation'
-import { useStoreStore } from '../../stores/store'
 
+const productStore = useProductStore()
 const storeStore = useStoreStore()
 const { addNewProduct, toggleModal } = storeStore
-const { getCategories, addStoreProduct } = useApi()
+const { categories } = storeToRefs(productStore)
+const { getCategories } = productStore
+const { addStoreProduct } = useApi()
 
-const categories = ref([])
 const formData = reactive({
   name: '',
   description: '',
@@ -31,8 +35,7 @@ const { validationRules, fieldValidation, clearError, validFieldForm } =
   useFormValidation(formData, formError, errorMessage)
 
 onMounted(async () => {
-  const categoriesData = await getCategories()
-  categories.value = categoriesData.categories
+  await getCategories()
   formData.categoryId = categories.value[0].id
 })
 

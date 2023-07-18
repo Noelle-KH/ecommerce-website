@@ -1,33 +1,27 @@
 <script setup>
 import { reactive, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useProductStore } from '../../stores/product'
 import SearchIcon from '../icons/SearchIcon.vue'
 
-const emits = defineEmits(['filterAmount', 'filterCategory'])
-const props = defineProps(['categoriesData'])
-
-const categories = ref(null)
+const productStore = useProductStore()
+const { getProducts } = productStore
+const { categories } = storeToRefs(productStore)
 
 const range = reactive({
   min: 0,
   max: 1000
 })
-const errorMessage = ref(null)
+const amountError = ref(null)
 
 const clearError = () => {
-  errorMessage.value = null
+  amountError.value = null
 }
 
-watch(errorMessage, () => {
+watch(amountError, () => {
   const timer = setTimeout(clearError, 2000)
   return () => clearTimeout(timer)
 })
-
-watch(
-  () => props.categoriesData,
-  (newProp) => {
-    categories.value = newProp
-  }
-)
 
 const handleFilterAmount = () => {
   if (
@@ -38,14 +32,10 @@ const handleFilterAmount = () => {
     isNaN(range.min) ||
     isNaN(range.max)
   ) {
-    errorMessage.value = '請輸入有效的價格範圍'
+    amountError.value = '請輸入有效的價格範圍'
   } else {
-    emits('filterAmount', { min: range.min, max: range.max })
+    getProducts({ min: range.min, max: range.max })
   }
-}
-
-const handleFilterCategory = (categoryId) => {
-  emits('filterCategory', { categoryId })
 }
 </script>
 
@@ -60,7 +50,7 @@ const handleFilterCategory = (categoryId) => {
           v-for="category in categories"
           :key="category.id"
           class="block cursor-pointer hover:underline"
-          @click="handleFilterCategory(category.id)"
+          @click="getProducts({ categoryId: category.id })"
         >
           {{ category.name }}
         </span>
@@ -83,8 +73,8 @@ const handleFilterCategory = (categoryId) => {
         class="inline h-7 w-7 cursor-pointer active:scale-90"
         @click="handleFilterAmount"
       />
-      <p v-if="errorMessage" class="ml-4 mt-2 text-sm text-red-500">
-        {{ errorMessage }}
+      <p v-if="amountError" class="ml-4 mt-2 text-sm text-red-500">
+        {{ amountError }}
       </p>
     </div>
   </aside>

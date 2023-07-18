@@ -22,7 +22,9 @@ onMounted(async () => {
     if (!isAuthenticate.value || user.value?.role !== 'buyer') {
       Swal.fire({
         icon: 'error',
-        title: '沒有使用該頁面的權限'
+        title: !isAuthenticate.value
+          ? '請先註冊或登入才能使用功能'
+          : '沒有使用該頁面的權限'
       })
       return router.replace({ name: 'HomeView' })
     }

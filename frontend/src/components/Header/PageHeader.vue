@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import { useRouter, useRoute, RouterLink } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../../stores/auth'
+import { useProductStore } from '../../stores/product'
 import SearchIcon from '../icons/SearchIcon.vue'
 import CartIcon from '../icons/CartIcon.vue'
 import StoreIcon from '../icons/StoreIcon.vue'
@@ -11,10 +12,11 @@ import StoreIcon from '../icons/StoreIcon.vue'
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
-const { isAuthenticate,  user } = storeToRefs(authStore)
+const productStore = useProductStore()
+const { isAuthenticate, user } = storeToRefs(authStore)
+const { getProducts } = productStore
 const { toggleModal } = authStore
 const { changeAuthenticateStatus } = authStore
-const emits = defineEmits(['filterKeyword'])
 
 const keyword = ref('')
 
@@ -27,10 +29,6 @@ const handleGetCart = () => {
   } else {
     router.push({ name: 'CartView' })
   }
-}
-
-const handleSubmit = () => {
-  emits('filterKeyword', { keyword: keyword.value })
 }
 
 const handleLogout = () => {
@@ -73,11 +71,13 @@ const handleLogout = () => {
           熱門關鍵字：
           <button
             class="cursor-pointer rounded-full border border-stone-300 bg-stone-300 px-3 py-1 hover:bg-stone-200"
+            @click="getProducts({ keyword: '狗狗罐頭' })"
           >
             狗狗罐頭
           </button>
           <button
             class="ml-1 cursor-pointer rounded-full border border-stone-300 bg-stone-300 px-3 py-1 hover:bg-stone-200"
+            @click="getProducts({ keyword: '貓貓罐頭' })"
           >
             貓貓罐頭
           </button>

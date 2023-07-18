@@ -1,71 +1,27 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
-import useApi from '../composable/useApi'
+import { onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useProductStore } from '../stores/product'
 import HeroSection from '../components/Home/HeroSection.vue'
 import SideBar from '../components/Home/SideBar.vue'
 import ProductList from '../components/Home/ProductList.vue'
-import LoadAnimation from '../components/LoadAnimation.vue'
 
-const props = defineProps(['keyword'])
-const { getAllProduct, getCategories } = useApi()
-
-const products = ref([])
-const categories = ref([])
-const searchResult = ref(null)
-const errorMessage = ref(null)
-const isLoading = ref(false)
+const productStore = useProductStore()
+const { errorMessage } = storeToRefs(productStore)
+const { getProducts, getCategories } = productStore
 
 onMounted(async () => {
-  try {
-    isLoading.value = true
-    const productsData = await getAllProduct()
-    const categoriesData = await getCategories()
-    products.value = productsData.products
-    categories.value = categoriesData.categories
-  } catch (error) {
-    errorMessage.value = error.message
-  } finally {
-    isLoading.value = false
-  }
+  await getProducts()
+  await getCategories()
 })
-
-watch(
-  () => props.keyword,
-  (keyword) => {
-    handleSearchResult(keyword)
-  }
-)
-
-const handleSearchResult = async (filterQuery) => {
-  try {
-    isLoading.value = true
-    const data = await getAllProduct(true, filterQuery)
-    searchResult.value = data.products
-  } catch (error) {
-    errorMessage.value = error.message
-  } finally {
-    isLoading.value = false
-  }
-}
 </script>
 
 <template>
   <main>
     <HeroSection />
     <section class="relative flex min-h-screen px-10 py-12">
-      <SideBar
-        @filterAmount="handleSearchResult"
-        @filterCategory="handleSearchResult"
-        :categoriesData="categories ? categories : ''"
-      />
-      <ProductList
-        v-if="searchResult ? searchResult : products"
-        :products="searchResult ? searchResult : products"
-      />
-      <LoadAnimation
-        v-if="isLoading && !errorMessage"
-        class="absolute left-[50%] top-[20%]"
-      />
+      <SideBar />
+      <ProductList />
       <p v-if="errorMessage" class="absolute left-[35%] top-[20%]">
         {{ errorMessage }}
       </p>

@@ -1,5 +1,5 @@
 <script setup>
-import { defineAsyncComponent, ref } from 'vue'
+import { defineAsyncComponent } from 'vue'
 import { RouterView } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from './stores/auth'
@@ -11,16 +11,11 @@ const LoginModal = defineAsyncComponent(() =>
 
 const authStore = useAuthStore()
 const { showLoginModal } = storeToRefs(authStore)
-const keyword = ref('')
-
-const handleSearchKeyword = (filterQuery) => {
-  keyword.value = filterQuery
-}
 </script>
 
 <template>
-  <PageHeader @filterKeyword="handleSearchKeyword" />
+  <PageHeader />
   <LoginModal v-if="showLoginModal" />
-  <RouterView :keyword="keyword" />
+  <RouterView />
   <PageFooter />
 </template>

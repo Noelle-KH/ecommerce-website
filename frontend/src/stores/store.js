@@ -25,12 +25,10 @@ export const useStoreStore = defineStore('store', () => {
 
   const getStoreProducts = async (active = true) => {
     try {
-      const { products } = await getAllProduct(active)
-
       if (active) {
-        activeProducts.value = products
+        activeProducts.value = await getAllProduct(active)
       } else {
-        nonActiveProducts.value = products
+        nonActiveProducts.value = await getAllProduct(active)
       }
     } catch (error) {
       errorMessage.value = error.message

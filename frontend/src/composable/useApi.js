@@ -16,10 +16,10 @@ const useApi = () => {
     }
   }
 
-  const getCategories = async () => {
+  const getAllCategory = async () => {
     try {
       const response = await axiosInstance.get('/categories')
-      return response.data.data
+      return response.data.data.categories
     } catch (error) {
       throw error.response.data
     }
@@ -42,7 +42,7 @@ const useApi = () => {
 
       const response = await axiosInstance.get(`/products${query}`)
 
-      return response.data.data
+      return response.data.data.products
     } catch (error) {
       throw error.response.data
     }
@@ -101,7 +101,7 @@ const useApi = () => {
 
   return {
     login,
-    getCategories,
+    getAllCategory,
     getAllProduct,
     addStoreProduct,
     updateProductStatus,

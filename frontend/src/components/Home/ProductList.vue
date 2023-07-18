@@ -1,7 +1,10 @@
 <script setup>
+import { storeToRefs } from 'pinia'
+import { useProductStore } from '../../stores/product'
 import ProductItem from './ProductItem.vue'
 
-defineProps(['products'])
+const productStore = useProductStore()
+const { products } = storeToRefs(productStore)
 </script>
 
 <template>
@@ -15,10 +18,9 @@ defineProps(['products'])
         v-for="product in products"
         :key="product.id"
         class="rounded-sm shadow-md"
+        :class="[product.stock === 0 ? 'opacity-40' : '']"
       >
-        <ProductItem
-          :product="product"
-        />
+        <ProductItem :product="product" />
       </div>
     </div>
   </section>
