@@ -1,17 +1,19 @@
 <script setup>
+import Swal from 'sweetalert2'
+import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../../stores/auth'
 import { useCartStore } from '../../stores/cart'
 import CartIcon from '../icons/CartIcon.vue'
 import CartItem from './CartItem.vue'
-import { onMounted } from 'vue'
-import Swal from 'sweetalert2'
+import LoadAnimation from '../LoadAnimation.vue'
 
 const authStore = useAuthStore()
 const cartStore = useCartStore()
 const { updateUserCart } = authStore
 const { getCartItems, checkout } = cartStore
-const { cartItems, totalAmount } = storeToRefs(cartStore)
+const { cartItems, totalAmount, errorMessage, isLoading } =
+  storeToRefs(cartStore)
 
 onMounted(async () => {
   await getCartItems()
@@ -44,6 +46,10 @@ const handleCheckout = () => {
     <h3 class="relative mb-6 mt-4 flex text-2xl font-bold">
       <CartIcon class="mr-2 h-8 w-8 text-orange-500" /> 購物車
     </h3>
+    <LoadAnimation v-if="isLoading" />
+    <p v-if="errorMessage" class="text-center text-red-500">
+      {{ errorMessage }}
+    </p>
     <table v-if="cartItems && cartItems.length" class="w-full table-auto">
       <thead class="border border-orange-400 bg-orange-300">
         <tr>
@@ -69,7 +75,7 @@ const handleCheckout = () => {
     <div class="mt-6 text-end">
       <p class="text-xl font-bold">總金額： NT$ {{ totalAmount }}</p>
       <button
-        class="mt-2 rounded-sm bg-orange-400 px-16 py-1 hover:bg-orange-300"
+        class="mt-2 rounded-sm bg-orange-400 px-16 py-1 hover:bg-orange-300 disabled:bg-stone-400"
         :disabled="cartItems && !cartItems.length"
         @click="handleCheckout"
       >

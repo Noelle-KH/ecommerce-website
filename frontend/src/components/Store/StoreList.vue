@@ -40,7 +40,9 @@ onMounted(async () => {
       </button>
     </h3>
     <LoadAnimation v-if="isLoading" />
-    <p v-if="errorMessage">{{ errorMessage }}</p>
+    <p v-if="errorMessage" class="text-center text-red-500">
+      {{ errorMessage }}
+    </p>
     <table v-if="products && products.length" class="w-full table-auto">
       <thead class="border border-sky-400 bg-sky-300">
         <tr>

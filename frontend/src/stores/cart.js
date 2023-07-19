@@ -10,6 +10,7 @@ export const useCartStore = defineStore('cart', () => {
     updateCartStatus
   } = useApi()
   const cartItems = ref([])
+  const isLoading = ref(false)
   const errorMessage = ref(null)
 
   const totalAmount = computed(() => {
@@ -30,9 +31,12 @@ export const useCartStore = defineStore('cart', () => {
 
   const getCartItems = async () => {
     try {
+      isLoading.value = true
       cartItems.value = await getAllCartItem()
     } catch (error) {
       errorMessage.value = error.message
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -103,6 +107,8 @@ export const useCartStore = defineStore('cart', () => {
 
   return {
     cartItems,
+    isLoading,
+    errorMessage,
     totalAmount,
     cartItemsAmount,
     getCartItems,

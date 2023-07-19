@@ -17,7 +17,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const storeStore = useStoreStore()
 const { isAuthenticate, user } = storeToRefs(authStore)
-const { showAddItemModal, errorMessage } = storeToRefs(storeStore)
+const { showAddItemModal } = storeToRefs(storeStore)
 
 onMounted(async () => {
   if (!isAuthenticate.value || user.value?.role !== 'seller') {
@@ -33,10 +33,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="px-10 py-12">
-    <p v-if="errorMessage" class="text-center text-red-500">
-      {{ errorMessage }}
-    </p>
+  <main v-if="isAuthenticate && user.role === 'seller'" class="px-10 py-12">
     <AddItemModal v-if="showAddItemModal" />
     <StoreList :active="true" />
     <StoreList :active="false" />

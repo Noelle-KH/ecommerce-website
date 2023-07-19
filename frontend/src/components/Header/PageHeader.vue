@@ -48,7 +48,7 @@ const handleLogout = () => {
     class="w-full bg-white px-10 py-5"
     :class="[
       route.path === '/' && !showLoginModal
-        ? 'fixed left-0 top-0 z-10 shadow-md'
+        ? 'sticky left-0 top-0 z-10 shadow-md'
         : ''
     ]"
   >

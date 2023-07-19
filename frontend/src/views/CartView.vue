@@ -1,10 +1,13 @@
 <script setup>
 import Swal from 'sweetalert2'
-import { onMounted } from 'vue'
+import { defineAsyncComponent, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth'
-import CartList from '../components/Cart/CartList.vue'
+
+const CartList = defineAsyncComponent(() =>
+  import('../components/Cart/CartList.vue')
+)
 
 const authStore = useAuthStore()
 const { isAuthenticate, user } = storeToRefs(authStore)
@@ -24,7 +27,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="px-10 py-12">
+  <main v-if="isAuthenticate && user.role === 'buyer'" class="px-10 py-12">
     <CartList />
   </main>
 </template>
