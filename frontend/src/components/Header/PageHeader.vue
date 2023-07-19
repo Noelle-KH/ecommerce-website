@@ -13,10 +13,9 @@ const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 const productStore = useProductStore()
-const { isAuthenticate, user } = storeToRefs(authStore)
+const { isAuthenticate, user, showLoginModal } = storeToRefs(authStore)
+const { toggleModal, changeAuthenticateStatus } = authStore
 const { getProducts } = productStore
-const { toggleModal } = authStore
-const { changeAuthenticateStatus } = authStore
 
 const keyword = ref('')
 
@@ -45,7 +44,14 @@ const handleLogout = () => {
 </script>
 
 <template>
-  <header class="px-10 py-5">
+  <header
+    class="w-full bg-white px-10 py-5"
+    :class="[
+      route.path === '/' && !showLoginModal
+        ? 'fixed left-0 top-0 z-10 shadow-md'
+        : ''
+    ]"
+  >
     <nav class="flex flex-wrap items-center justify-between">
       <div>
         <RouterLink :to="{ name: 'HomeView' }">
@@ -62,7 +68,7 @@ const handleLogout = () => {
           />
           <button
             class="flex h-10 items-center rounded-r-md border border-stone-600 bg-orange-400 px-2 hover:bg-orange-300"
-            @click="handleSubmit"
+            @click="getProducts({ keyword })"
           >
             <SearchIcon class="w-8" />
           </button>
