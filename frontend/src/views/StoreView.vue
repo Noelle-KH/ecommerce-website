@@ -18,7 +18,6 @@ const authStore = useAuthStore()
 const storeStore = useStoreStore()
 const { isAuthenticate, user } = storeToRefs(authStore)
 const { showAddItemModal, errorMessage } = storeToRefs(storeStore)
-const { getStoreProducts } = storeStore
 
 onMounted(async () => {
   if (!isAuthenticate.value || user.value?.role !== 'seller') {
@@ -30,9 +29,6 @@ onMounted(async () => {
     })
     return router.replace({ name: 'HomeView' })
   }
-
-  await getStoreProducts()
-  await getStoreProducts(false)
 })
 </script>
 

@@ -21,10 +21,12 @@ export const useStoreStore = defineStore('store', () => {
   const showAddItemModal = ref(false)
   const activeProducts = ref([])
   const nonActiveProducts = ref([])
+  const isLoading = ref(false)
   const errorMessage = ref(null)
 
   const getStoreProducts = async (active = true) => {
     try {
+      isLoading.value = true
       if (active) {
         activeProducts.value = await getAllProduct(active)
       } else {
@@ -32,10 +34,12 @@ export const useStoreStore = defineStore('store', () => {
       }
     } catch (error) {
       errorMessage.value = error.message
+    } finally {
+      isLoading.value = false
     }
   }
 
-  const addNewProduct = async (product) => {
+  const addNewProduct = (product) => {
     activeProducts.value = [product, ...activeProducts.value]
   }
 
@@ -68,6 +72,7 @@ export const useStoreStore = defineStore('store', () => {
   }
 
   return {
+    isLoading,
     showAddItemModal,
     activeProducts,
     nonActiveProducts,

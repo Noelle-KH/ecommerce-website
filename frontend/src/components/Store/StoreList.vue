@@ -1,19 +1,25 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useStoreStore } from '../../stores/store'
 import StoreItem from './StoreItem.vue'
+import LoadAnimation from '../../components/LoadAnimation.vue'
 import PutOnIcon from '../icons/PutOnIcon.vue'
 import TackOffIcon from '../icons/TackOffIcon.vue'
 
 const storeStore = useStoreStore()
-const { activeProducts, nonActiveProducts } = storeToRefs(storeStore)
-const { toggleModal } = storeStore
+const { toggleModal, getStoreProducts } = storeStore
+const { activeProducts, nonActiveProducts, isLoading, errorMessage } =
+  storeToRefs(storeStore)
 
 const props = defineProps(['active'])
-const products = ref(props.active ? activeProducts : nonActiveProducts)
 const title = props.active ? '上架' : '下架'
 const tableHeader = props.active ? '下架' : '刪除'
+const products = props.active ? activeProducts : nonActiveProducts
+
+onMounted(async () => {
+  await Promise.all([getStoreProducts(), getStoreProducts(false)])
+})
 </script>
 
 <template>
@@ -33,7 +39,9 @@ const tableHeader = props.active ? '下架' : '刪除'
         新增上架商品
       </button>
     </h3>
-    <table class="w-full table-auto">
+    <LoadAnimation v-if="isLoading" />
+    <p v-if="errorMessage">{{ errorMessage }}</p>
+    <table v-if="products && products.length" class="w-full table-auto">
       <thead class="border border-sky-400 bg-sky-300">
         <tr>
           <th>{{ tableHeader }}</th>
@@ -45,7 +53,7 @@ const tableHeader = props.active ? '下架' : '刪除'
           <th>{{ active ? '更新' : '上架' }}商品</th>
         </tr>
       </thead>
-      <tbody v-if="products.length">
+      <tbody>
         <StoreItem
           v-for="product in products"
           :key="product.id"
@@ -54,7 +62,10 @@ const tableHeader = props.active ? '下架' : '刪除'
         />
       </tbody>
     </table>
-    <p v-if="!products.length" class="mt-2 text-center text-lg">
+    <p
+      v-if="!isLoading && products && !products.length"
+      class="mt-2 text-center text-lg"
+    >
       沒有{{ title }}商品
     </p>
   </section>
