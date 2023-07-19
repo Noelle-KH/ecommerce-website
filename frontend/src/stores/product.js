@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import useApi from '../composable/useApi'
 
 export const useProductStore = defineStore('product', () => {
-  const { getAllProduct, getAllCategory } = useApi()
+  const { getAllProduct, getAllCategory, addCartItem } = useApi()
   const products = ref([])
   const categories = ref([])
   const isLoading = ref(false)
@@ -30,12 +30,23 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
+  const addToCart = async (id) => {
+    try {
+      const product = products.value.find((product) => product.id === id)
+      const { status, message } = await addCartItem(product.id)
+      return { status, message }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return {
     isLoading,
     products,
     categories,
     errorMessage,
     getProducts,
-    getCategories
+    getCategories,
+    addToCart
   }
 })

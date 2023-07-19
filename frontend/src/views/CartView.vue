@@ -1,48 +1,30 @@
 <script setup>
 import Swal from 'sweetalert2'
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../stores/auth'
-import useApi from '../composable/useApi'
 import CartList from '../components/Cart/CartList.vue'
-import LoadAnimation from '../components/LoadAnimation.vue'
 
 const authStore = useAuthStore()
 const { isAuthenticate, user } = storeToRefs(authStore)
 const router = useRouter()
-const { getCartItems } = useApi()
-
-const cartItems = ref([])
-const isLoading = ref(false)
-const errorMessage = ref(null)
 
 onMounted(async () => {
-  try {
-    if (!isAuthenticate.value || user.value?.role !== 'buyer') {
-      Swal.fire({
-        icon: 'error',
-        title: !isAuthenticate.value
-          ? '請先註冊或登入才能使用功能'
-          : '沒有使用該頁面的權限'
-      })
-      return router.replace({ name: 'HomeView' })
-    }
-    isLoading.value = true
-    const cartItemsData = await getCartItems()
-    cartItems.value = cartItemsData.cart.cartItem
-  } catch (error) {
-    errorMessage.value = error.message
-  } finally {
-    isLoading.value = false
+  if (!isAuthenticate.value || user.value?.role !== 'buyer') {
+    Swal.fire({
+      icon: 'error',
+      title: !isAuthenticate.value
+        ? '請先註冊或登入才能使用功能'
+        : '沒有使用該頁面的權限'
+    })
+    return router.replace({ name: 'HomeView' })
   }
 })
 </script>
 
 <template>
   <main class="px-10 py-12">
-    <p v-if="errorMessage">{{ errorMessage }}</p>
-    <LoadAnimation v-if="isLoading && !errorMessage" />
-    <CartList v-if="cartItems" :cartItems="cartItems" />
+    <CartList />
   </main>
 </template>

@@ -15,6 +15,10 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const updateUserCart = (cartId) => {
+    user.value.cartId = cartId
+  }
+
   const toggleModal = () => {
     showLoginModal.value = !showLoginModal.value
   }
@@ -24,6 +28,7 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     showLoginModal,
     changeAuthenticateStatus,
+    updateUserCart,
     toggleModal
   }
 })

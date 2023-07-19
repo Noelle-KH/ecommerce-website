@@ -1,15 +1,16 @@
 <script setup>
 import Swal from 'sweetalert2'
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../../stores/auth'
+import { useProductStore } from '../../stores/product'
 import CartIcon from '../icons/CartIcon.vue'
 
 const authStore = useAuthStore()
+const productStore = useProductStore()
 const { isAuthenticate, user } = storeToRefs(authStore)
+const { addToCart } = productStore
 const props = defineProps(['product'])
-const router = useRouter()
 
 const formatName = computed(() => {
   return props.product.name.length > 30
@@ -17,14 +18,23 @@ const formatName = computed(() => {
     : props.product.name
 })
 
-const handleGetCart = () => {
-  if (!isAuthenticate.value) {
-    Swal.fire({
-      icon: 'error',
-      text: '請先註冊或登入才能使用功能'
-    })
-  } else {
-    router.push({ name: 'CartView' })
+const handleAddCartItem = async (id) => {
+  try {
+    if (!isAuthenticate.value) {
+      return Swal.fire({
+        icon: 'error',
+        title: '請先註冊或登入才能使用功能'
+      })
+    }
+    const { status, message } = await addToCart(id)
+    if (status === 'success') {
+      Swal.fire({
+        icon: 'success',
+        title: message
+      })
+    }
+  } catch (error) {
+    console.log(error)
   }
 }
 </script>
@@ -44,7 +54,7 @@ const handleGetCart = () => {
       <CartIcon
         v-show="user?.role !== 'seller' && product.stock !== 0"
         class="h-6 w-6 cursor-pointer text-orange-400 hover:text-orange-500"
-        @click="handleGetCart"
+        @click="handleAddCartItem(product.id)"
       />
       <span class="text-sm text-stone-500">{{
         product.stock !== 0 ? `還剩 ${product.stock} 件` : '售完'

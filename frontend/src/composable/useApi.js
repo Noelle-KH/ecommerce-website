@@ -89,13 +89,61 @@ const useApi = () => {
     }
   }
 
-  const getCartItems = async () => {
+  const getAllCartItem = async () => {
     try {
       const response = await axiosAuthInstance.get('/carts')
 
-      return response.data.data
+      return response.data.data.cart.cartItem
     } catch (error) {
       throw error.response.data
+    }
+  }
+
+  const addCartItem = async (productId) => {
+    try {
+      const response = await axiosAuthInstance.post(
+        '/carts',
+        { productId },
+        { headers: { 'Content-Type': 'application/json' } }
+      )
+
+      return response.data
+    } catch (error) {
+      throw error.response.data
+    }
+  }
+
+  const updateCartItemAmount = async (cartItemId, amount) => {
+    try {
+      const response = await axiosAuthInstance.patch(
+        `/carts/${cartItemId}`,
+        { amount },
+        { headers: { 'Content-Type': 'application/json' } }
+      )
+
+      return response.data
+    } catch (error) {
+      throw error.response.data
+    }
+  }
+
+  const deleteCartItem = async (cartItemId) => {
+    try {
+      const response = await axiosAuthInstance.delete(`/carts/${cartItemId}`)
+
+      return response.data
+    } catch (error) {
+      throw error.response.data
+    }
+  }
+
+  const updateCartStatus = async () => {
+    try {
+      const response = await axiosAuthInstance.patch('/carts')
+
+      return response.data
+    } catch (error) {
+      throw error.response.data.data
     }
   }
 
@@ -106,7 +154,11 @@ const useApi = () => {
     addStoreProduct,
     updateProductStatus,
     deleteStoreProduct,
-    getCartItems
+    getAllCartItem,
+    addCartItem,
+    updateCartItemAmount,
+    deleteCartItem,
+    updateCartStatus
   }
 }
 

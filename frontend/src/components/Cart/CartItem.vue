@@ -1,34 +1,41 @@
 <script setup>
-import { computed, reactive } from 'vue'
+import Swal from 'sweetalert2'
+import { computed } from 'vue'
+import { useCartStore } from '../../stores/cart'
 import DeleteIcon from '../icons/DeleteIcon.vue'
 import MinusIcon from '../icons/MinusIcon.vue'
 import PlusIcon from '../icons/PlusIcon.vue'
 
-const props = defineProps(['cartItemData'])
-const cartItem = reactive(props.cartItemData)
+const cartStore = useCartStore()
+const { updateAmount, setAmount, removeCartItem } = cartStore
+const props = defineProps(['cartItem'])
 const total = computed(() => {
-  return cartItem.amount * cartItem.product.price
+  return props.cartItem.amount * props.cartItem.product.price
 })
 
-const handleMinusAmount = () => {
-  if (cartItem.amount < 2) {
+const handleRemoveCartItem = (id) => {
+  Swal.fire({
+    icon: 'warning',
+    title: '確定要刪除商品嗎?',
+    showCancelButton: true,
+    confirmButtonText: '確定',
+    cancelButtonText: '取消'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      return removeCartItem(id)
+    }
     return
-  }
-  cartItem.amount = cartItem.amount - 1
-}
-
-const handlePlusAmount = () => {
-  if (cartItem.amount > cartItem.product.stock) {
-    return
-  }
-  cartItem.amount = cartItem.amount + 1
+  })
 }
 </script>
 
 <template>
   <tr class="border border-orange-400 text-center">
     <td>
-      <DeleteIcon class="mx-auto h-5 w-5 cursor-pointer hover:text-stone-600" />
+      <DeleteIcon
+        class="mx-auto h-5 w-5 cursor-pointer hover:text-stone-600"
+        @click="handleRemoveCartItem(cartItem.id)"
+      />
     </td>
     <td>
       <img
@@ -45,15 +52,19 @@ const handlePlusAmount = () => {
       <div class="flex items-center justify-center">
         <MinusIcon
           class="h-5 w-5 cursor-pointer select-none hover:text-stone-500"
-          @click="handleMinusAmount"
+          @click="updateAmount(cartItem.id, '-')"
         />
         <input
+          type="text"
           class="mx-1 w-10 cursor-pointer border border-stone-600 text-center"
-          v-model="cartItem.amount"
+          :value="cartItem.amount"
+          @blur="
+            (event) => setAmount(cartItem.id, Number(event.target.value))
+          "
         />
         <PlusIcon
           class="h-5 w-5 cursor-pointer select-none hover:text-stone-500"
-          @click="handlePlusAmount"
+          @click="updateAmount(cartItem.id, '+')"
         />
       </div>
     </td>
