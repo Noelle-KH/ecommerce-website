@@ -5,7 +5,7 @@ const errorHandler = (error, req, res, next) => {
 
   if (error.code === 'LIMIT_FILE_SIZE') {
     statusCode = 400
-    code = 4005
+    code = 4006
     message = '檔案超過限制大小'
   }
 

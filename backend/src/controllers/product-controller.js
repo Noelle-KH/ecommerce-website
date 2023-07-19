@@ -2,7 +2,7 @@ const createError = require('http-errors')
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
-const authController = {
+const productController = {
   getAllProduct: async (req, res, next) => {
     try {
       const active = req.query.active !== 'false'
@@ -161,4 +161,4 @@ const authController = {
   }
 }
 
-module.exports = authController
+module.exports = productController

@@ -31,7 +31,7 @@ const authController = {
 
       const isMatch = await bcrypt.compare(password, foundUser.password)
       if (!isMatch) {
-        throw createError(400, '帳號或密碼錯誤', { code: 4002 })
+        throw createError(400, '帳號或密碼錯誤', { code: 4003 })
       }
 
       const user =
