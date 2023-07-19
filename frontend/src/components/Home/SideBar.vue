@@ -1,12 +1,16 @@
 <script setup>
-import { reactive, ref, watch } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useProductStore } from '../../stores/product'
 import SearchIcon from '../icons/SearchIcon.vue'
 
 const productStore = useProductStore()
-const { getProducts } = productStore
+const { getProducts, getCategories } = productStore
 const { categories } = storeToRefs(productStore)
+
+onMounted(async () => {
+  await getCategories()
+})
 
 const range = reactive({
   min: 0,
