@@ -31,8 +31,13 @@ const formError = reactive({
   stock: null
 })
 const errorMessage = ref(null)
-const { validationRules, fieldValidation, clearError, validFieldForm } =
-  useFormValidation(formData, formError, errorMessage)
+const {
+  validationRules,
+  fieldValidation,
+  clearError,
+  validFieldForm,
+  responseError
+} = useFormValidation(formData, formError, errorMessage)
 
 onMounted(async () => {
   await getCategories()
@@ -69,19 +74,7 @@ const handleSubmit = async () => {
         })
       }
     } catch (error) {
-      if (error.code === 4003) {
-        formError.name = error.message
-      } else if (error.code === 4004) {
-        formError.name = error.message
-      } else if (error.code === 4005) {
-        formError.image = error.message
-      } else if (error.code === 4006) {
-        formError.price = error.message
-      } else if (error.code === 4007) {
-        formError.stock = error.message
-      } else {
-        errorMessage.value = error.message
-      }
+      responseError(error)
     }
   }
 }

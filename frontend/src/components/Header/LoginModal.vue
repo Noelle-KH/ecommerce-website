@@ -19,8 +19,13 @@ const formError = reactive({
   password: null
 })
 const errorMessage = ref(null)
-const { validationRules, fieldValidation, clearError, validFieldForm } =
-  useFormValidation(formData, formError, errorMessage)
+const {
+  validationRules,
+  fieldValidation,
+  clearError,
+  validFieldForm,
+  responseError
+} = useFormValidation(formData, formError, errorMessage)
 
 watch([formError, errorMessage], () => {
   const timer = setTimeout(clearError, 2000)
@@ -65,14 +70,7 @@ const handleSubmit = async () => {
         })
       }
     } catch (error) {
-      if (error.code === 4001) {
-        formError.account = error.message
-      } else if (error.code === 4002) {
-        formError.account = error.message
-        formError.password = error.message
-      } else {
-        errorMessage.value = error.message
-      }
+      responseError(error)
     }
   }
 }

@@ -21,6 +21,29 @@ const switchErrorName = (fieldName) => {
   }
 }
 
+const switchErrorCode = (code) => {
+  switch (code) {
+    case 4001:
+      return 'account'
+    case 4002:
+      return 'password'
+    case 4003:
+      return 'account password'
+    case 4004:
+      return 'name'
+    case 4005:
+      return 'description'
+    case 4006:
+      return 'image'
+    case 4007:
+      return 'price'
+    case 4008:
+      return 'stock'
+    default:
+      return
+  }
+}
+
 const useFormValidation = (formData, formError, errorMessage) => {
   const validationRules = (fieldName) => {
     if (!formData[fieldName]) return `${switchErrorName(fieldName)}不得為空`
@@ -45,12 +68,32 @@ const useFormValidation = (formData, formError, errorMessage) => {
       if (formError[key] !== null) {
         return false
       }
-      return true
     }
-
+    return true
   }
 
-  return { validationRules, fieldValidation, clearError, validFieldForm }
+  const responseError = (error) => {
+    const { code, message } = error
+    const errorField = switchErrorCode(code)
+
+    if (!errorField) {
+      errorMessage.value = message
+    } else if (errorField === 'account password') {
+      errorField
+        .split(' ')
+        .forEach((fieldName) => (formError[fieldName] = message))
+    } else {
+      formError[errorField] = message
+    }
+  }
+
+  return {
+    validationRules,
+    fieldValidation,
+    clearError,
+    validFieldForm,
+    responseError
+  }
 }
 
 export default useFormValidation
