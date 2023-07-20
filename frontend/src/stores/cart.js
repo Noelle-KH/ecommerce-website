@@ -5,6 +5,7 @@ import useApi from '../composable/useApi'
 export const useCartStore = defineStore('cart', () => {
   const {
     getAllCartItem,
+    addCartItem,
     updateCartItemAmount,
     deleteCartItem,
     updateCartStatus
@@ -37,6 +38,28 @@ export const useCartStore = defineStore('cart', () => {
       errorMessage.value = error.message
     } finally {
       isLoading.value = false
+    }
+  }
+
+  const addNewCartItem = async (productId) => {
+    try {
+      const { status, message, data } = await addCartItem(productId)
+
+      if (status === 'success') {
+        const cartItem = cartItems.value.find(
+          (cartItem) => cartItem.product.id === productId
+        )
+        if (cartItem) {
+          cartItem.amount = cartItem.amount + 1
+        } else {
+          console.log(data)
+          cartItems.value = [{ ...data.cartItem }, ...cartItems.value]
+        }
+
+        return { status, message }
+      }
+    } catch (error) {
+      throw error.message
     }
   }
 
@@ -112,6 +135,7 @@ export const useCartStore = defineStore('cart', () => {
     totalAmount,
     cartItemsAmount,
     getCartItems,
+    addNewCartItem,
     updateAmount,
     setAmount,
     removeCartItem,

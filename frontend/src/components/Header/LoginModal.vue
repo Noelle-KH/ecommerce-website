@@ -2,11 +2,14 @@
 import { reactive, ref } from 'vue'
 import Swal from 'sweetalert2'
 import { useAuthStore } from '../../stores/auth'
+import { useCartStore } from '../../stores/cart'
 import useApi from '../../composable/useApi'
 import useFormValidation from '../../composable/useFormValidation'
 
 const authStore = useAuthStore()
+const cartStore = useCartStore()
 const { changeAuthenticateStatus, toggleModal } = authStore
+const { getCartItems } = cartStore
 const { login } = useApi()
 
 const loginType = ref('會員')
@@ -54,6 +57,7 @@ const handleSubmit = async () => {
           icon: 'success',
           title: message
         }).then(async () => {
+          await getCartItems()
           changeAuthenticateStatus(true)
           toggleModal()
         })

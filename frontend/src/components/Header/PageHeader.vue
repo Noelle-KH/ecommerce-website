@@ -1,10 +1,11 @@
 <script setup>
 import Swal from 'sweetalert2'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter, useRoute, RouterLink } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../../stores/auth'
 import { useProductStore } from '../../stores/product'
+import { useCartStore } from '../../stores/cart'
 import SearchIcon from '../icons/SearchIcon.vue'
 import CartIcon from '../icons/CartIcon.vue'
 import StoreIcon from '../icons/StoreIcon.vue'
@@ -13,22 +14,20 @@ const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 const productStore = useProductStore()
+const cartStore = useCartStore()
 const { isAuthenticate, user, showLoginModal } = storeToRefs(authStore)
 const { toggleModal, changeAuthenticateStatus } = authStore
 const { getProducts } = productStore
+const { cartItemsAmount } = storeToRefs(cartStore)
+const { getCartItems } = cartStore
 
 const keyword = ref('')
 
-const handleGetCart = () => {
-  if (!isAuthenticate.value) {
-    Swal.fire({
-      icon: 'error',
-      text: '請先註冊或登入才能使用功能'
-    })
-  } else {
-    router.push({ name: 'CartView' })
+onMounted(async () => {
+  if (isAuthenticate.value && user.value?.role === 'buyer') {
+    await getCartItems()
   }
-}
+})
 
 const handleLogout = () => {
   localStorage.clear()
@@ -102,11 +101,17 @@ const handleLogout = () => {
             v-if="user?.role === 'seller'"
             class="w-8 cursor-pointer hover:text-stone-600"
           />
-          <CartIcon
-            v-else
-            class="w-8 cursor-pointer hover:text-stone-600"
-            @click="handleGetCart"
-          />
+          <div v-else class="relative">
+            <CartIcon
+              class="w-8 cursor-pointer hover:text-stone-600"
+              @click="router.push({ name: 'CartView' })"
+            />
+            <span
+              v-if="isAuthenticate"
+              class="absolute right-[-15%] top-[5%] h-[20px] w-[20px] rounded-full bg-orange-400 text-center text-xs leading-5"
+              >{{ cartItemsAmount }}
+            </span>
+          </div>
         </RouterLink>
         <p v-else class="text-sm font-bold">{{ user?.account }}</p>
         <button

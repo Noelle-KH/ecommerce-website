@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive, ref, watch } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useProductStore } from '../../stores/product'
 import SearchIcon from '../icons/SearchIcon.vue'
@@ -18,15 +18,6 @@ const range = reactive({
 })
 const amountError = ref(null)
 
-const clearError = () => {
-  amountError.value = null
-}
-
-watch(amountError, () => {
-  const timer = setTimeout(clearError, 2000)
-  return () => clearTimeout(timer)
-})
-
 const handleFilterAmount = () => {
   if (
     range.max < range.min ||
@@ -38,6 +29,7 @@ const handleFilterAmount = () => {
   ) {
     amountError.value = '請輸入有效的價格範圍'
   } else {
+    amountError.value = null
     getProducts({ min: range.min, max: range.max })
   }
 }
