@@ -1,9 +1,9 @@
 <script setup>
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref } from 'vue'
 import Swal from 'sweetalert2'
+import { useAuthStore } from '../../stores/auth'
 import useApi from '../../composable/useApi'
 import useFormValidation from '../../composable/useFormValidation'
-import { useAuthStore } from '../../stores/auth'
 
 const authStore = useAuthStore()
 const { changeAuthenticateStatus, toggleModal } = authStore
@@ -19,18 +19,9 @@ const formError = reactive({
   password: null
 })
 const errorMessage = ref(null)
-const {
-  validationRules,
-  fieldValidation,
-  clearError,
-  validFieldForm,
-  responseError
-} = useFormValidation(formData, formError, errorMessage)
 
-watch([formError, errorMessage], () => {
-  const timer = setTimeout(clearError, 2000)
-  return () => clearTimeout(timer)
-})
+const { validationRules, fieldValidation, validFieldForm, responseError } =
+  useFormValidation(formData, formError, errorMessage)
 
 const handleChangeTitle = () => {
   formData.account = ''
@@ -42,8 +33,6 @@ const handleChangeTitle = () => {
 }
 
 const handleSubmit = async () => {
-  clearError()
-
   fieldValidation(validationRules('account'), 'account')
   fieldValidation(validationRules('password'), 'password')
 
@@ -64,7 +53,7 @@ const handleSubmit = async () => {
         Swal.fire({
           icon: 'success',
           title: message
-        }).then(() => {
+        }).then(async () => {
           changeAuthenticateStatus(true)
           toggleModal()
         })
@@ -142,7 +131,6 @@ const handleSubmit = async () => {
             ? 'bg-orange-400 hover:bg-orange-300'
             : 'bg-sky-400 hover:bg-sky-300'
         ]"
-        :disabled="formError.account && formData.password"
       >
         登入
       </button>

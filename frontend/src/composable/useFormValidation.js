@@ -54,14 +54,6 @@ const useFormValidation = (formData, formError, errorMessage) => {
     return (formError[fieldName] = validator || null)
   }
 
-  const clearError = () => {
-    const errorKeys = Object.keys(formError)
-    for (const key of errorKeys) {
-      formError[key] = null
-    }
-    errorMessage.value = null
-  }
-
   const validFieldForm = () => {
     const errorKeys = Object.keys(formError)
     for (const key of errorKeys) {
@@ -77,7 +69,7 @@ const useFormValidation = (formData, formError, errorMessage) => {
     const errorField = switchErrorCode(code)
 
     if (!errorField) {
-      errorMessage.value = message
+      errorMessage.value = '伺服器錯誤，請稍後再使用'
     } else if (errorField === 'account password') {
       errorField
         .split(' ')
@@ -90,7 +82,6 @@ const useFormValidation = (formData, formError, errorMessage) => {
   return {
     validationRules,
     fieldValidation,
-    clearError,
     validFieldForm,
     responseError
   }
