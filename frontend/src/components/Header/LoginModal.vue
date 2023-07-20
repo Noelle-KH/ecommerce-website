@@ -57,7 +57,9 @@ const handleSubmit = async () => {
           icon: 'success',
           title: message
         }).then(async () => {
-          await getCartItems()
+          if (user.role === 'buyer') {
+            await getCartItems()
+          }
           changeAuthenticateStatus(true)
           toggleModal()
         })

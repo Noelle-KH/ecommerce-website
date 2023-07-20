@@ -17,7 +17,7 @@ const formData = reactive({
   name: '',
   description: '',
   image: '',
-  categoryId: '',
+  categoryId: categories.value[0].id,
   price: '',
   stock: ''
 })
@@ -25,18 +25,13 @@ const formError = reactive({
   name: null,
   description: null,
   image: null,
-  categoryId: categories.value[0].id,
+  categoryId: null,
   price: null,
   stock: null
 })
 const errorMessage = ref(null)
-const {
-  validationRules,
-  fieldValidation,
-  validFieldForm,
-  responseError
-} = useFormValidation(formData, formError, errorMessage)
-
+const { validationRules, fieldValidation, validFieldForm, responseError } =
+  useFormValidation(formData, formError, errorMessage)
 
 const handleFileChange = (event) => {
   formData.image = event.target.files[0]
