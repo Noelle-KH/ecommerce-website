@@ -4,9 +4,10 @@ import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../../stores/auth'
 import { useCartStore } from '../../stores/cart'
 import { useAlert } from '../../composable/useAlert'
-import CartIcon from '../icons/CartIcon.vue'
 import CartItem from './CartItem.vue'
+import TableWrapper from '../UI/TableWrapper.vue'
 import LoadAnimation from '../LoadAnimation.vue'
+import CartIcon from '../icons/CartIcon.vue'
 
 const authStore = useAuthStore()
 const cartStore = useCartStore()
@@ -21,12 +22,9 @@ onMounted(async () => {
 })
 
 const handleCheckout = () => {
-  showAlert(
-    'info',
-    '確定要結帳嗎?',
-    true,
-    `目前總金額：NT$ ${totalAmount.value}`
-  ).then(async (result) => {
+  const text = `目前總金額：NT$ ${totalAmount.value}`
+
+  showAlert('info', '確定要結帳嗎?', true, text).then(async (result) => {
     if (result.isConfirmed) {
       try {
         const cartId = await checkout()
@@ -49,25 +47,23 @@ const handleCheckout = () => {
     <p v-if="errorMessage" class="text-center text-red-500">
       {{ errorMessage }}
     </p>
-    <table v-if="cartItems && cartItems.length" class="w-full table-auto">
-      <thead class="border border-orange-400 bg-orange-300">
-        <tr>
-          <th>刪除</th>
-          <th>圖片</th>
-          <th>名稱</th>
-          <th>單價</th>
-          <th>數量</th>
-          <th>總計</th>
-        </tr>
-      </thead>
-      <tbody>
+    <TableWrapper v-if="cartItems && cartItems.length" color="orange">
+      <template #header
+        ><th>刪除</th>
+        <th>圖片</th>
+        <th>名稱</th>
+        <th>單價</th>
+        <th>數量</th>
+        <th>總計</th>
+      </template>
+      <template #body>
         <CartItem
           v-for="cartItem in cartItems"
           :key="cartItem.id"
           :cartItem="cartItem"
         />
-      </tbody>
-    </table>
+      </template>
+    </TableWrapper>
     <p v-if="cartItems && !cartItems.length" class="text-center text-lg">
       購物車內沒有商品
     </p>

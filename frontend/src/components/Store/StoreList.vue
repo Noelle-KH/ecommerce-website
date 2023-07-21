@@ -3,6 +3,7 @@ import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useStoreStore } from '../../stores/store'
 import StoreItem from './StoreItem.vue'
+import TableWrapper from '../UI/TableWrapper.vue'
 import LoadAnimation from '../../components/LoadAnimation.vue'
 import PutOnIcon from '../icons/PutOnIcon.vue'
 import TackOffIcon from '../icons/TackOffIcon.vue'
@@ -43,27 +44,25 @@ onMounted(async () => {
     <p v-if="errorMessage" class="text-center text-red-500">
       {{ errorMessage }}
     </p>
-    <table v-if="products && products.length" class="w-full table-auto">
-      <thead class="border border-sky-400 bg-sky-300">
-        <tr>
-          <th>{{ tableHeader }}</th>
-          <th>商品圖片</th>
-          <th>商品名稱</th>
-          <th>商品描述</th>
-          <th>商品單價</th>
-          <th>商品庫存</th>
-          <th>{{ active ? '更新' : '上架' }}商品</th>
-        </tr>
-      </thead>
-      <tbody>
+    <TableWrapper color="sky" v-if="products && products.length">
+      <template #header>
+        <th>{{ tableHeader }}</th>
+        <th>商品圖片</th>
+        <th>商品名稱</th>
+        <th>商品描述</th>
+        <th>商品單價</th>
+        <th>商品庫存</th>
+        <th>{{ active ? '更新' : '上架' }}商品</th>
+      </template>
+      <template #body>
         <StoreItem
           v-for="product in products"
           :key="product.id"
           :active="active"
           :product="product"
         />
-      </tbody>
-    </table>
+      </template>
+    </TableWrapper>
     <p
       v-if="!isLoading && products && !products.length"
       class="mt-2 text-center text-lg"
