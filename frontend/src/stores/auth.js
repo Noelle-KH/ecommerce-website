@@ -17,6 +17,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const updateUserCart = (cartId) => {
     user.value.cartId = cartId
+    localStorage.setItem('user', JSON.stringify(user.value))
   }
 
   const toggleModal = () => {

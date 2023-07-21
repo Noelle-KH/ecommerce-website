@@ -1,6 +1,6 @@
 <script setup>
 import Swal from 'sweetalert2'
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useStoreStore } from '../../stores/store'
 import { useProductStore } from '../../stores/product'
@@ -11,13 +11,14 @@ const productStore = useProductStore()
 const storeStore = useStoreStore()
 const { addNewProduct, toggleModal } = storeStore
 const { categories } = storeToRefs(productStore)
+const { getCategories } = productStore
 const { addStoreProduct } = useApi()
 
 const formData = reactive({
   name: '',
   description: '',
   image: '',
-  categoryId: categories.value[0].id,
+  categoryId: '',
   price: '',
   stock: ''
 })
@@ -32,6 +33,11 @@ const formError = reactive({
 const errorMessage = ref(null)
 const { validationRules, fieldValidation, validFieldForm, responseError } =
   useFormValidation(formData, formError, errorMessage)
+
+onMounted(async () => {
+  await getCategories()
+  formData.categoryId = categories.value[0].id
+})
 
 const handleFileChange = (event) => {
   formData.image = event.target.files[0]
