@@ -6,6 +6,7 @@ import { useAlert } from '../../composable/useAlert'
 import { useApi } from '../../composable/useApi'
 import { useFormValidation } from '../../composable/useFormValidation'
 import FormWrapper from '../UI/FormWrapper.vue'
+import InputWrapper from '../UI/InputWrapper.vue'
 
 const authStore = useAuthStore()
 const cartStore = useCartStore()
@@ -87,40 +88,25 @@ const handleSubmit = async () => {
       {{ loginType }}登入
     </h2>
 
-    <div>
-      <label for="account" class="before:text-red-500 before:content-['*']">
-        帳號：
-        <span v-if="formError.account" class="text-xs text-red-500">
-          {{ formError.account }}
-        </span>
-      </label>
-      <input
-        type="text"
-        class="mb-6 mt-2 w-full rounded-sm border px-2 py-1 sm:block sm:w-80"
-        :class="[formError.account ? 'border-red-400' : 'border-stone-400']"
-        placeholder="請輸入帳號"
-        v-model="formData.account"
-      />
-    </div>
+    <InputWrapper
+      name="帳號"
+      type="text"
+      :auth="true"
+      :data="formData.account"
+      :error="formError.account"
+      placeholder="請輸入帳號"
+      v-model="formData.account"
+    />
+    <InputWrapper
+      name="密碼"
+      type="password"
+      :auth="true"
+      :data="formData.password"
+      :error="formError.password"
+      placeholder="請輸入密碼"
+      v-model="formData.password"
+    />
 
-    <div>
-      <label for="password" class="before:text-red-500 before:content-['*']">
-        密碼：
-        <span v-if="formError.password" class="text-xs text-red-500">
-          {{ formError.password }}
-        </span>
-      </label>
-      <input
-        type="password"
-        class="mt-2 w-full rounded-sm border px-2 py-1 sm:block sm:w-80"
-        :class="[
-          formError.password ? 'border-red-400' : 'border-stone-400',
-          errorMessage ? 'mb-4' : 'mb-12'
-        ]"
-        placeholder="請輸入密碼"
-        v-model="formData.password"
-      />
-    </div>
     <p v-if="errorMessage" class="mb-4 text-center text-xs text-red-500">
       {{ errorMessage }}
     </p>
