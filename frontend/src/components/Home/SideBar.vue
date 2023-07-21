@@ -5,8 +5,8 @@ import { useProductStore } from '../../stores/product'
 import SearchIcon from '../icons/SearchIcon.vue'
 
 const productStore = useProductStore()
-const { getProducts, getCategories } = productStore
-const { categories } = storeToRefs(productStore)
+const { getCategories, setSearchResult } = productStore
+const { categories, searchQuery } = storeToRefs(productStore)
 
 onMounted(async () => {
   await getCategories()
@@ -30,8 +30,14 @@ const handleFilterAmount = () => {
     amountError.value = '請輸入有效的價格範圍'
   } else {
     amountError.value = null
-    getProducts({ min: range.min, max: range.max })
+    searchQuery.value = { min: range.min, max: range.max }
+    setSearchResult('amount')
   }
+}
+
+const handleFilterCategory = (categoryId) => {
+  searchQuery.value = { categoryId }
+  setSearchResult('category')
 }
 </script>
 
@@ -46,7 +52,7 @@ const handleFilterAmount = () => {
           v-for="category in categories"
           :key="category.id"
           class="block cursor-pointer hover:underline"
-          @click="getProducts({ categoryId: category.id })"
+          @click="handleFilterCategory(category.id)"
         >
           {{ category.name }}
         </span>

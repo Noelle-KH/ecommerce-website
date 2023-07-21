@@ -1,6 +1,6 @@
 <script setup>
 import Swal from 'sweetalert2'
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { useRouter, useRoute, RouterLink } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../../stores/auth'
@@ -17,17 +17,21 @@ const productStore = useProductStore()
 const cartStore = useCartStore()
 const { isAuthenticate, user, showLoginModal } = storeToRefs(authStore)
 const { toggleModal, changeAuthenticateStatus } = authStore
-const { getProducts } = productStore
+const { setSearchResult } = productStore
+const { searchQuery } = storeToRefs(productStore)
 const { cartItemsAmount } = storeToRefs(cartStore)
 const { getCartItems } = cartStore
-
-const keyword = ref('')
 
 onMounted(async () => {
   if (isAuthenticate.value && user.value?.role === 'buyer') {
     await getCartItems()
   }
 })
+
+const handleSubmit = (keyword) => {
+  searchQuery.value = keyword
+  setSearchResult('keyword')
+}
 
 const handleLogout = () => {
   localStorage.clear()
@@ -46,7 +50,7 @@ const handleLogout = () => {
   <header
     class="w-full bg-white px-10 py-5"
     :class="[
-      route.path === '/' && !showLoginModal
+      (route.path === '/' || route.path == '/search') && !showLoginModal
         ? 'sticky left-0 top-0 z-10 shadow-md'
         : ''
     ]"
@@ -63,11 +67,11 @@ const handleLogout = () => {
             class="rounded-l-md border border-stone-600 px-2 sm:w-72"
             type="text"
             placeholder="搜尋關鍵字"
-            v-model="keyword"
+            v-model="searchQuery"
           />
           <button
             class="flex h-10 items-center rounded-r-md border border-stone-600 bg-orange-400 px-2 hover:bg-orange-300"
-            @click="getProducts({ keyword })"
+            @click="setSearchResult('keyword')"
           >
             <SearchIcon class="w-8" />
           </button>
@@ -76,13 +80,13 @@ const handleLogout = () => {
           熱門關鍵字：
           <button
             class="cursor-pointer rounded-full border border-stone-300 bg-stone-300 px-3 py-1 hover:bg-stone-200"
-            @click="getProducts({ keyword: '狗狗罐頭' })"
+            @click="handleSubmit('狗狗罐頭')"
           >
             狗狗罐頭
           </button>
           <button
             class="ml-1 cursor-pointer rounded-full border border-stone-300 bg-stone-300 px-3 py-1 hover:bg-stone-200"
-            @click="getProducts({ keyword: '貓貓罐頭' })"
+            @click="handleSubmit('貓貓罐頭')"
           >
             貓貓罐頭
           </button>
@@ -90,7 +94,7 @@ const handleLogout = () => {
       </div>
       <div class="flex items-center gap-5">
         <RouterLink
-          v-if="route.path === '/'"
+          v-if="route.path === '/' || route.path === '/search'"
           :to="
             user?.role === 'seller'
               ? { name: 'StoreView' }
