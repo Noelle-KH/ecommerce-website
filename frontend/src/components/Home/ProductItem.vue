@@ -1,17 +1,18 @@
 <script setup>
-import Swal from 'sweetalert2'
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../../stores/auth'
 import { useCartStore } from '../../stores/cart'
+import { useAlert } from '../../composable/useAlert'
 import CartIcon from '../icons/CartIcon.vue'
+
+const props = defineProps(['product'])
 
 const authStore = useAuthStore()
 const cartStore = useCartStore()
 const { isAuthenticate, user } = storeToRefs(authStore)
 const { addNewCartItem } = cartStore
-
-const props = defineProps(['product'])
+const { showAlert } = useAlert()
 
 const formatName = computed(() => {
   return props.product.name.length > 30
@@ -22,23 +23,14 @@ const formatName = computed(() => {
 const handleAddCartItem = async (id) => {
   try {
     if (!isAuthenticate.value) {
-      return Swal.fire({
-        icon: 'error',
-        title: '請先註冊或登入才能使用功能'
-      })
+      return showAlert('error', '請先註冊或登入才能使用功能')
     }
     const { status, message } = await addNewCartItem(id)
     if (status === 'success') {
-      Swal.fire({
-        icon: 'success',
-        title: message
-      })
+      showAlert('success', message)
     }
   } catch (error) {
-    Swal.fire({
-      icon: 'error',
-      title: error
-    })
+    showAlert('error', error)
   }
 }
 </script>

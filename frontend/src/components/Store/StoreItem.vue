@@ -1,22 +1,18 @@
 <script setup>
-import Swal from 'sweetalert2'
 import DeleteIcon from '../icons/DeleteIcon.vue'
 import PutOnIcon from '../icons/PutOnIcon.vue'
 import TackOffIcon from '../icons/TackOffIcon.vue'
 import { useStoreStore } from '../../stores/store'
+import { useAlert } from '../../composable/useAlert'
+
+defineProps(['active', 'product'])
 
 const storeStore = useStoreStore()
 const { toggleActive, deleteProduct } = storeStore
-defineProps(['active', 'product'])
+const { showAlert } = useAlert()
 
 const handleDeleteProduct = (id) => {
-  Swal.fire({
-    icon: 'warning',
-    title: '確定要刪除商品嗎?',
-    showCancelButton: true,
-    confirmButtonText: '確定',
-    cancelButtonText: '取消'
-  }).then((result) => {
+  showAlert('warning', '確定要刪除商品嗎?', true).then((result) => {
     if (result.isConfirmed) {
       return deleteProduct(id)
     }

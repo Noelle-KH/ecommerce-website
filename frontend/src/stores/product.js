@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { defineStore } from 'pinia'
-import useApi from '../composable/useApi'
+import { useApi } from '../composable/useApi'
 
 export const useProductStore = defineStore('product', () => {
   const router = useRouter()

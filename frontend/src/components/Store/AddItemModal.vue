@@ -1,11 +1,11 @@
 <script setup>
-import Swal from 'sweetalert2'
 import { onMounted, reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useStoreStore } from '../../stores/store'
 import { useProductStore } from '../../stores/product'
-import useApi from '../../composable/useApi'
-import useFormValidation from '../../composable/useFormValidation'
+import { useAlert } from '../../composable/useAlert'
+import { useApi } from '../../composable/useApi'
+import { useFormValidation } from '../../composable/useFormValidation'
 
 const productStore = useProductStore()
 const storeStore = useStoreStore()
@@ -13,6 +13,7 @@ const { addNewProduct, toggleModal } = storeStore
 const { categories } = storeToRefs(productStore)
 const { getCategories } = productStore
 const { addStoreProduct } = useApi()
+const { showAlert } = useAlert()
 
 const formData = reactive({
   name: '',
@@ -53,10 +54,7 @@ const handleSubmit = async () => {
     try {
       const { product, message } = await addStoreProduct(formData)
       if (product) {
-        Swal.fire({
-          icon: 'success',
-          title: message
-        }).then(() => {
+        showAlert('success', message).then(() => {
           addNewProduct(product)
           toggleModal()
         })

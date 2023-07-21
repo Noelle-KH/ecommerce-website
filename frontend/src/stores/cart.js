@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import useApi from '../composable/useApi'
+import { useApi } from '../composable/useApi'
 
 export const useCartStore = defineStore('cart', () => {
   const {

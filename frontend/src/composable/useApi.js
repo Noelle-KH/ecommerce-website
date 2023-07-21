@@ -1,6 +1,6 @@
 import { axiosInstance, axiosAuthInstance } from '../util/axios'
 
-const useApi = () => {
+export const useApi = () => {
   const login = async (role, account, password) => {
     try {
       const response = await axiosInstance.post(`/login?role=${role}`, {
@@ -161,5 +161,3 @@ const useApi = () => {
     updateCartStatus
   }
 }
-
-export default useApi

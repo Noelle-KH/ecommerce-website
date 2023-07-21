@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import useApi from '../composable/useApi'
+import { useApi } from '../composable/useApi'
 
 const toggleData = (id, originPosition, newPosition) => {
   const product = originPosition.value.find((product) => product.id === id)

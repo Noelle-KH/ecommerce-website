@@ -44,7 +44,7 @@ const switchErrorCode = (code) => {
   }
 }
 
-const useFormValidation = (formData, formError, errorMessage) => {
+export const useFormValidation = (formData, formError, errorMessage) => {
   const validationRules = (fieldName) => {
     if (!formData[fieldName]) return `${switchErrorName(fieldName)}不得為空`
     return null
@@ -86,5 +86,3 @@ const useFormValidation = (formData, formError, errorMessage) => {
     responseError
   }
 }
-
-export default useFormValidation

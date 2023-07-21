@@ -1,9 +1,9 @@
 <script setup>
-import Swal from 'sweetalert2'
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../../stores/auth'
 import { useCartStore } from '../../stores/cart'
+import { useAlert } from '../../composable/useAlert'
 import CartIcon from '../icons/CartIcon.vue'
 import CartItem from './CartItem.vue'
 import LoadAnimation from '../LoadAnimation.vue'
@@ -14,20 +14,19 @@ const { updateUserCart } = authStore
 const { getCartItems, checkout } = cartStore
 const { cartItems, totalAmount, errorMessage, isLoading } =
   storeToRefs(cartStore)
+const { showAlert } = useAlert()
 
 onMounted(async () => {
   await getCartItems()
 })
 
 const handleCheckout = () => {
-  Swal.fire({
-    icon: 'info',
-    title: '確定要結帳嗎?',
-    text: `目前總金額：NT$ ${totalAmount.value}`,
-    showCancelButton: true,
-    confirmButtonText: '確定',
-    cancelButtonText: '取消'
-  }).then(async (result) => {
+  showAlert(
+    'info',
+    '確定要結帳嗎?',
+    true,
+    `目前總金額：NT$ ${totalAmount.value}`
+  ).then(async (result) => {
     if (result.isConfirmed) {
       try {
         const cartId = await checkout()

@@ -1,15 +1,16 @@
 <script setup>
 import { reactive, ref } from 'vue'
-import Swal from 'sweetalert2'
 import { useAuthStore } from '../../stores/auth'
 import { useCartStore } from '../../stores/cart'
-import useApi from '../../composable/useApi'
-import useFormValidation from '../../composable/useFormValidation'
+import { useAlert } from '../../composable/useAlert'
+import { useApi } from '../../composable/useApi'
+import { useFormValidation } from '../../composable/useFormValidation'
 
 const authStore = useAuthStore()
 const cartStore = useCartStore()
 const { changeAuthenticateStatus, toggleModal } = authStore
 const { getCartItems } = cartStore
+const { showAlert } = useAlert()
 const { login } = useApi()
 
 const loginType = ref('會員')
@@ -53,10 +54,7 @@ const handleSubmit = async () => {
         localStorage.setItem('user', JSON.stringify(user))
         localStorage.setItem('token', token)
 
-        Swal.fire({
-          icon: 'success',
-          title: message
-        }).then(async () => {
+        showAlert('success', message).then(async () => {
           if (user.role === 'buyer') {
             await getCartItems()
           }

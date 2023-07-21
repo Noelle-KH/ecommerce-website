@@ -1,11 +1,11 @@
 <script setup>
-import Swal from 'sweetalert2'
 import { onMounted } from 'vue'
 import { useRouter, useRoute, RouterLink } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../../stores/auth'
 import { useProductStore } from '../../stores/product'
 import { useCartStore } from '../../stores/cart'
+import { useAlert } from '../../composable/useAlert'
 import SearchIcon from '../icons/SearchIcon.vue'
 import CartIcon from '../icons/CartIcon.vue'
 import StoreIcon from '../icons/StoreIcon.vue'
@@ -21,6 +21,7 @@ const { setSearchResult } = productStore
 const { searchQuery } = storeToRefs(productStore)
 const { cartItemsAmount } = storeToRefs(cartStore)
 const { getCartItems } = cartStore
+const { showAlert } = useAlert()
 
 onMounted(async () => {
   if (isAuthenticate.value && user.value?.role === 'buyer') {
@@ -36,10 +37,7 @@ const handleSubmit = (keyword) => {
 const handleLogout = () => {
   localStorage.clear()
 
-  Swal.fire({
-    icon: 'success',
-    title: '登出成功'
-  }).then(() => {
+  showAlert('success', '登出成功').then(() => {
     changeAuthenticateStatus(false)
     router.replace({ name: 'HomeView' })
   })
