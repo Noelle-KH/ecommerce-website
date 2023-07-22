@@ -143,7 +143,7 @@ export const useApi = () => {
 
       return response.data
     } catch (error) {
-      throw error.response.data.data
+      throw error.response.data
     }
   }
 

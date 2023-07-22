@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useApi } from '../composable/useApi'
+import { useAlert } from '../composable/useAlert'
 
 export const useCartStore = defineStore('cart', () => {
   const {
@@ -10,9 +11,11 @@ export const useCartStore = defineStore('cart', () => {
     deleteCartItem,
     updateCartStatus
   } = useApi()
+  const { showAlert } = useAlert()
   const cartItems = ref([])
   const isLoading = ref(false)
   const errorMessage = ref(null)
+  let timer
 
   const totalAmount = computed(() => {
     return cartItems.value.length
@@ -62,23 +65,27 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
-  const updateAmount = async (id, type) => {
+  const updateAmount = (id, type) => {
     try {
+      clearTimeout(timer)
+
       const cartItem = cartItems.value.find((item) => item.id === id)
 
       if (type === '-') {
         if (cartItem.amount < 2) {
-          return
+          return showAlert('warning', '數量不能小於1')
         }
         cartItem.amount = cartItem.amount - 1
       } else {
         if (cartItem.amount > cartItem.product.stock - 1) {
-          return
+          return showAlert('warning', '已達該商品最大庫存量')
         }
         cartItem.amount = cartItem.amount + 1
       }
 
-      await updateCartItemAmount(cartItem.id, cartItem.amount)
+      timer = setTimeout(async () => {
+        await updateCartItemAmount(cartItem.id, cartItem.amount)
+      }, 500)
     } catch (error) {
       errorMessage.value = error.message
     }
@@ -119,11 +126,29 @@ export const useCartStore = defineStore('cart', () => {
     try {
       const { status, data } = await updateCartStatus()
       if (status === 'success') {
-        cartItems.value = []
         return data.cartId
       }
     } catch (error) {
-      errorMessage.value = error.message
+      showAlert('error', error.message).then(async () => {
+        const adjustCartItemAmount = cartItems.value
+          .filter((cartItem) => cartItem.amount > cartItem.product.stock)
+          .map((cartItem) => ({
+            id: cartItem.id,
+            amount: cartItem.product.stock
+          }))
+
+        await Promise.all(
+          adjustCartItemAmount.map((cartItem) =>
+            updateCartItemAmount(cartItem.id, cartItem.amount)
+          )
+        )
+
+        cartItems.value = cartItems.value.map((cartItem) =>
+          cartItem.amount > cartItem.product.stock
+            ? { ...cartItem, amount: cartItem.product.stock }
+            : cartItem
+        )
+      })
     }
   }
 
