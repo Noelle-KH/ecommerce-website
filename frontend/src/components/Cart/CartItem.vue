@@ -35,7 +35,7 @@ const handleRemoveCartItem = (id) => {
     <td>
       <img
         :src="cartItem.product.image"
-        class="mx-auto w-20"
+        class="mx-auto h-20 w-20 object-cover"
         :alt="cartItem.product.name"
       />
     </td>

@@ -52,7 +52,6 @@ export const useCartStore = defineStore('cart', () => {
         if (cartItem) {
           cartItem.amount = cartItem.amount + 1
         } else {
-          console.log(data)
           cartItems.value = [{ ...data.cartItem }, ...cartItems.value]
         }
 

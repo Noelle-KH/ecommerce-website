@@ -36,7 +36,7 @@ const handleDeleteProduct = (id) => {
       />
     </td>
     <td>
-      <img :src="product.image" class="mx-auto w-20" />
+      <img :src="product.image" class="mx-auto w-20 h-20 object-cover" />
     </td>
     <td>{{ product.name }}</td>
     <td>{{ product.description }}</td>

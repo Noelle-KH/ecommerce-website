@@ -37,7 +37,7 @@ const handleAddCartItem = async (id) => {
 
 <template>
   <img
-    class="object-cover"
+    class="object-cover w-full h-60"
     :class="[product.stock !== 0 ? 'cursor-pointer hover:opacity-80' : '']"
     :src="product.image"
     :alt="product.name"
