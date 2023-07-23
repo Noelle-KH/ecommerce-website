@@ -47,7 +47,7 @@ const handleCheckout = () => {
     <p v-if="errorMessage" class="text-center text-red-500">
       {{ errorMessage }}
     </p>
-    <TableWrapper v-if="cartItems && cartItems.length" color="orange">
+    <TableWrapper type="cart" v-if="cartItems && cartItems.length">
       <template #header
         ><th>刪除</th>
         <th>圖片</th>

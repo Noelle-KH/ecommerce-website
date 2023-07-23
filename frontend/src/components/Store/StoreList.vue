@@ -44,7 +44,7 @@ onMounted(async () => {
     <p v-if="errorMessage" class="text-center text-red-500">
       {{ errorMessage }}
     </p>
-    <TableWrapper color="sky" v-if="products && products.length">
+    <TableWrapper type="store" v-if="products && products.length">
       <template #header>
         <th>{{ tableHeader }}</th>
         <th>商品圖片</th>
