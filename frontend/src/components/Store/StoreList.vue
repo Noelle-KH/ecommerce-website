@@ -27,7 +27,7 @@ onMounted(async () => {
     await Promise.all([getStoreProducts(), getStoreProducts(false)])
   } catch (error) {
     showAlert('error', error)
-    return router.replace({ name: 'HomeView' })
+    return router.replace({ name: 'ProductList' })
   }
 })
 </script>

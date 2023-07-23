@@ -39,7 +39,7 @@ const handleLogout = () => {
 
   showAlert('success', '登出成功').then(() => {
     changeAuthenticateStatus(false)
-    router.replace({ name: 'HomeView' })
+    router.replace({ name: 'ProductList' })
   })
 }
 </script>
@@ -48,14 +48,14 @@ const handleLogout = () => {
   <header
     class="w-full bg-white px-10 py-5"
     :class="[
-      (route.path === '/' || route.path == '/search') && !showLoginModal
+      (route.path !== '/cart' || route.path !== '/store') && !showLoginModal
         ? 'sticky left-0 top-0 z-10 shadow-md'
         : ''
     ]"
   >
     <nav class="flex flex-wrap items-center justify-between">
       <div>
-        <RouterLink :to="{ name: 'HomeView' }">
+        <RouterLink :to="{ name: 'ProductList' }">
           <img class="w-24" src="../../assets/logo.png" alt="logo" />
         </RouterLink>
       </div>
@@ -92,7 +92,7 @@ const handleLogout = () => {
       </div>
       <div class="flex items-center gap-5">
         <RouterLink
-          v-if="route.path === '/' || route.path === '/search'"
+          v-if="route.path !== '/cart' || route.path !== '/store'"
           :to="
             user?.role === 'seller'
               ? { name: 'StoreView' }

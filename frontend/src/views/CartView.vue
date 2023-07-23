@@ -22,7 +22,7 @@ onMounted(() => {
 
     showAlert('error', title)
 
-    return router.replace({ name: 'HomeView' })
+    return router.go(-1)
   }
 })
 </script>

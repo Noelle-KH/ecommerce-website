@@ -24,7 +24,7 @@ onMounted(async () => {
     await getCartItems()
   } catch (error) {
     showAlert('error', error)
-    return router.replace({ name: 'HomeView' })
+    return router.replace({ name: 'ProductList' })
   }
 })
 
