@@ -53,11 +53,7 @@ export const useApi = () => {
       const response = await axiosAuthInstance.post(
         '/products',
         { ...product },
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }
+        { headers: { 'Content-Type': 'multipart/form-data' } }
       )
       const { message } = response.data
 
@@ -99,11 +95,11 @@ export const useApi = () => {
     }
   }
 
-  const addCartItem = async (productId) => {
+  const addCartItem = async (cartId, productId) => {
     try {
       const response = await axiosAuthInstance.post(
         '/carts',
-        { productId },
+        { cartId, productId },
         { headers: { 'Content-Type': 'application/json' } }
       )
 

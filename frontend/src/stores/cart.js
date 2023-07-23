@@ -44,9 +44,9 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
-  const addNewCartItem = async (productId) => {
+  const addNewCartItem = async (cartId, productId) => {
     try {
-      const { status, message, data } = await addCartItem(productId)
+      const { status, message, data } = await addCartItem(cartId, productId)
 
       if (status === 'success') {
         const cartItem = cartItems.value.find(
@@ -126,6 +126,7 @@ export const useCartStore = defineStore('cart', () => {
     try {
       const { status, data } = await updateCartStatus()
       if (status === 'success') {
+        cartItems.value = []
         return data.cartId
       }
     } catch (error) {

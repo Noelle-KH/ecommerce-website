@@ -25,7 +25,8 @@ const handleAddCartItem = async (id) => {
     if (!isAuthenticate.value) {
       return showAlert('error', '請先註冊或登入才能使用功能')
     }
-    const { status, message } = await addNewCartItem(id)
+
+    const { status, message } = await addNewCartItem(user.value.cartId, id)
     if (status === 'success') {
       showAlert('success', message)
     }
@@ -37,7 +38,7 @@ const handleAddCartItem = async (id) => {
 
 <template>
   <img
-    class="object-cover w-full h-60"
+    class="h-60 w-full object-cover"
     :class="[product.stock !== 0 ? 'cursor-pointer hover:opacity-80' : '']"
     :src="product.image"
     :alt="product.name"
