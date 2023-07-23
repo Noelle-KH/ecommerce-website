@@ -67,6 +67,41 @@ const productController = {
       next(error)
     }
   },
+  getProduct: async (req, res, next) => {
+    try {
+      const { id } = req.params
+      const product = await prisma.product.findFirst({
+        where: { id },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          image: true,
+          price: true,
+          stock: true,
+          category: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        }
+      })
+
+      if (!product) {
+        throw createError(404, '該商品不存在')
+      }
+
+      res.json({
+        status: 'success',
+        data: {
+          product
+        }
+      })
+    } catch (error) {
+      next(error)
+    }
+  },
   postProduct: async (req, res, next) => {
     try {
       const { file } = req

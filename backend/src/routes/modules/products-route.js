@@ -4,7 +4,10 @@ const { productValidation } = require('../../middleware/validation')
 const upload = require('../../middleware/multer')
 const productController = require('../../controllers/product-controller')
 
-router.use('/:id', verifyToken, verifyRole('seller'))
+router.get('/:id', productController.getProduct)
+router.get('/', productController.getAllProduct)
+
+router.use(verifyToken, verifyRole('seller'))
 router
   .route('/:id')
   .put(
@@ -17,10 +20,7 @@ router
 
 router
   .route('/')
-  .get(productController.getAllProduct)
   .post(
-    verifyToken,
-    verifyRole('seller'),
     upload.single('image'),
     productValidation,
     productController.postProduct
