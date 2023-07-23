@@ -38,7 +38,7 @@ export const useCartStore = defineStore('cart', () => {
       isLoading.value = true
       cartItems.value = await getAllCartItem()
     } catch (error) {
-      errorMessage.value = error.message
+      throw error.message
     } finally {
       isLoading.value = false
     }

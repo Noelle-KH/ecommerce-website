@@ -20,7 +20,7 @@ const { isAuthenticate, user } = storeToRefs(authStore)
 const { showAddItemModal } = storeToRefs(storeStore)
 const { showAlert } = useAlert()
 
-onMounted(async () => {
+onMounted(() => {
   if (!isAuthenticate.value || user.value?.role !== 'seller') {
     const title = !isAuthenticate.value
       ? '請先註冊或登入才能使用功能'

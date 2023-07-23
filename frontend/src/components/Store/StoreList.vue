@@ -1,17 +1,21 @@
 <script setup>
 import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useStoreStore } from '../../stores/store'
+import { useAlert } from '../../composable/useAlert'
 import StoreItem from './StoreItem.vue'
 import TableWrapper from '../UI/TableWrapper.vue'
 import LoadAnimation from '../../components/LoadAnimation.vue'
 import PutOnIcon from '../icons/PutOnIcon.vue'
 import TackOffIcon from '../icons/TackOffIcon.vue'
 
+const router = useRouter()
 const storeStore = useStoreStore()
 const { toggleModal, getStoreProducts } = storeStore
 const { activeProducts, nonActiveProducts, isLoading, errorMessage } =
   storeToRefs(storeStore)
+const { showAlert } = useAlert()
 
 const props = defineProps(['active'])
 const title = props.active ? '上架' : '下架'
@@ -19,7 +23,12 @@ const tableHeader = props.active ? '下架' : '刪除'
 const products = props.active ? activeProducts : nonActiveProducts
 
 onMounted(async () => {
-  await Promise.all([getStoreProducts(), getStoreProducts(false)])
+  try {
+    await Promise.all([getStoreProducts(), getStoreProducts(false)])
+  } catch (error) {
+    showAlert('error', error)
+    return router.replace({ name: 'HomeView' })
+  }
 })
 </script>
 

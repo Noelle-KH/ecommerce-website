@@ -33,7 +33,7 @@ export const useStoreStore = defineStore('store', () => {
         nonActiveProducts.value = await getAllProduct(active)
       }
     } catch (error) {
-      errorMessage.value = error.message
+      throw error.message
     } finally {
       isLoading.value = false
     }

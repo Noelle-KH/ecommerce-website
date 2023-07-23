@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../../stores/auth'
 import { useCartStore } from '../../stores/cart'
@@ -9,6 +10,7 @@ import TableWrapper from '../UI/TableWrapper.vue'
 import LoadAnimation from '../LoadAnimation.vue'
 import CartIcon from '../icons/CartIcon.vue'
 
+const router = useRouter()
 const authStore = useAuthStore()
 const cartStore = useCartStore()
 const { updateUserCart } = authStore
@@ -18,7 +20,12 @@ const { cartItems, totalAmount, errorMessage, isLoading } =
 const { showAlert } = useAlert()
 
 onMounted(async () => {
-  await getCartItems()
+  try {
+    await getCartItems()
+  } catch (error) {
+    showAlert('error', error)
+    return router.replace({ name: 'HomeView' })
+  }
 })
 
 const handleCheckout = () => {
