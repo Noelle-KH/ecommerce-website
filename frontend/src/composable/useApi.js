@@ -48,6 +48,16 @@ export const useApi = () => {
     }
   }
 
+  const getProduct = async (id) => {
+    try {
+      const response = await axiosInstance.get(`/products/${id}`)
+
+      return response.data.data.product
+    } catch (error) {
+      throw error.response.data
+    }
+  }
+
   const addStoreProduct = async (product) => {
     try {
       const response = await axiosAuthInstance.post(
@@ -147,6 +157,7 @@ export const useApi = () => {
     login,
     getAllCategory,
     getAllProduct,
+    getProduct,
     addStoreProduct,
     updateProductStatus,
     deleteStoreProduct,

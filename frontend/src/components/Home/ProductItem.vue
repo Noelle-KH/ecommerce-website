@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '../../stores/auth'
 import { useCartStore } from '../../stores/cart'
@@ -8,6 +9,7 @@ import CartIcon from '../icons/CartIcon.vue'
 
 const props = defineProps(['product'])
 
+const router = useRouter()
 const authStore = useAuthStore()
 const cartStore = useCartStore()
 const { isAuthenticate, user } = storeToRefs(authStore)
@@ -19,6 +21,10 @@ const formatName = computed(() => {
     ? `${props.product.name.slice(0, 25)}...`
     : props.product.name
 })
+
+const handleShowDetail = (id) => {
+  router.push({ name: 'ProductDetail', params: { id } })
+}
 
 const handleAddCartItem = async (id) => {
   try {
@@ -42,6 +48,7 @@ const handleAddCartItem = async (id) => {
     :class="[product.stock !== 0 ? 'cursor-pointer hover:opacity-80' : '']"
     :src="product.image"
     :alt="product.name"
+    @click="handleShowDetail(product.id)"
   />
   <div class="p-3">
     <p class="mb-1 font-bold">{{ formatName }}</p>

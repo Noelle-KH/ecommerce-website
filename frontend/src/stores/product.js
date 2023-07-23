@@ -5,8 +5,9 @@ import { useApi } from '../composable/useApi'
 
 export const useProductStore = defineStore('product', () => {
   const router = useRouter()
-  const { getAllProduct, getAllCategory } = useApi()
+  const { getAllProduct, getAllCategory, getProduct } = useApi()
   const products = ref([])
+  const product = ref(null)
   const searchQuery = ref('')
   const searchResult = ref(null)
   const categories = ref([])
@@ -27,6 +28,17 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
+  const getProductData = async (id) => {
+    try {
+      isLoading.value = true
+      product.value = await getProduct(id)
+    } catch (error) {
+      errorMessage.value = error.message
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const getCategories = async () => {
     try {
       const categoriesData = await getAllCategory()
@@ -40,7 +52,7 @@ export const useProductStore = defineStore('product', () => {
     if (searchType === 'keyword') {
       if (!searchQuery.value) {
         searchResult.value = null
-        return router.replace({ name: 'HomeView' })
+        return router.replace({ name: 'ProductList' })
       }
       searchResult.value = products.value.filter((product) =>
         product.name.includes(searchQuery.value)
@@ -75,11 +87,13 @@ export const useProductStore = defineStore('product', () => {
   return {
     isLoading,
     products,
+    product,
     searchQuery,
     searchResult,
     categories,
     errorMessage,
     getProducts,
+    getProductData,
     getCategories,
     setSearchResult
   }
