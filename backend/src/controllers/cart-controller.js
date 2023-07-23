@@ -44,8 +44,7 @@ const cartController = {
   },
   postCartItem: async (req, res, next) => {
     try {
-      const { cartId } = req.user
-      const { productId } = req.body
+      const { productId, cartId } = req.body
 
       let cartItem
 
@@ -156,12 +155,12 @@ const cartController = {
           select: { checkout: true }
         })
 
-        const newCartId = await tx.cart.create({
+        const newCart = await tx.cart.create({
           data: { buyerId },
           select: { id: true }
         })
 
-        return newCartId
+        return newCart.id
       })
 
       if (result) {
@@ -177,12 +176,11 @@ const cartController = {
   },
   updateCartItem: async (req, res, next) => {
     try {
-      const { cartId } = req.user
       const { cartItemId } = req.params
       const { amount } = req.body
 
       const cartItem = await prisma.cartItem.findFirst({
-        where: { id: cartItemId, cartId },
+        where: { id: cartItemId },
         select: {
           id: true,
           product: { select: { id: true, stock: true } }
@@ -213,11 +211,10 @@ const cartController = {
   },
   deleteCartItem: async (req, res, next) => {
     try {
-      const { cartId } = req.user
       const { cartItemId } = req.params
 
       const cartItem = await prisma.cartItem.findFirst({
-        where: { id: cartItemId, cartId },
+        where: { id: cartItemId },
         select: { id: true, amount: true, productId: true }
       })
 

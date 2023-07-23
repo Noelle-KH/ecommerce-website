@@ -521,12 +521,16 @@
           }
         ],
         "requestBody": {
-          "description": "提供產品的id",
+          "description": "提供購物車和產品的id",
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
+                  "cartId": {
+                    "type": "string",
+                    "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+                  },
                   "productId": {
                     "type": "string",
                     "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
@@ -634,6 +638,15 @@
                     "message": {
                       "type": "string",
                       "example": "購物車狀態更新成功"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "cartId": {
+                          "type": "string",
+                          "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+                        }
+                      }
                     }
                   }
                 }
