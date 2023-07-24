@@ -4,6 +4,8 @@ const switchErrorName = (fieldName) => {
       return '帳號'
     case 'password':
       return '密碼'
+    case 'confirmPassword':
+      return '確認密碼'
     case 'name':
       return '商品名稱'
     case 'description':
@@ -39,6 +41,10 @@ const switchErrorCode = (code) => {
       return 'price'
     case 4008:
       return 'stock'
+    case 4009:
+      return 'confirmPassword'
+    case 4010:
+      return 'password confirmPassword'
     default:
       return
   }
@@ -76,7 +82,10 @@ export const useFormValidation = (formData, formError, errorMessage) => {
     const errorField = switchErrorCode(code)
     if (!errorField) {
       errorMessage.value = '伺服器錯誤，請稍後再使用'
-    } else if (errorField === 'account password') {
+    } else if (
+      errorField === 'account password' ||
+      errorField === 'password confirmPassword'
+    ) {
       errorField
         .split(' ')
         .forEach((fieldName) => (formError.value[fieldName] = message))
@@ -85,10 +94,18 @@ export const useFormValidation = (formData, formError, errorMessage) => {
     }
   }
 
+  const resetForm = () => {
+    Object.keys(formData.value).forEach((fieldName) => {
+      formData.value[fieldName] = ''
+      formError.value[fieldName] = null
+    })
+  }
+
   return {
     validationRules,
     fieldValidation,
     validFieldForm,
-    responseError
+    responseError,
+    resetForm
   }
 }

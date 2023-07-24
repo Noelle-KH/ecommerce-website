@@ -15,7 +15,7 @@ const route = useRoute()
 const authStore = useAuthStore()
 const productStore = useProductStore()
 const cartStore = useCartStore()
-const { isAuthenticate, user, showLoginModal } = storeToRefs(authStore)
+const { isAuthenticate, user, showAuthModal } = storeToRefs(authStore)
 const { toggleModal, changeAuthenticateStatus } = authStore
 const { setSearchResult } = productStore
 const { searchQuery } = storeToRefs(productStore)
@@ -48,7 +48,7 @@ const handleLogout = () => {
   <header
     class="w-full bg-white px-10 py-5"
     :class="[
-      (route.path !== '/cart' || route.path !== '/store') && !showLoginModal
+      (route.path !== '/cart' || route.path !== '/store') && !showAuthModal
         ? 'sticky left-0 top-0 z-10 shadow-md'
         : ''
     ]"

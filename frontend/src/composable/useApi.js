@@ -1,16 +1,23 @@
 import { axiosInstance, axiosAuthInstance } from '../util/axios'
 
 export const useApi = () => {
-  const login = async (role, account, password) => {
+  const login = async (role, data) => {
     try {
-      const response = await axiosInstance.post(`/login?role=${role}`, {
-        account,
-        password
-      })
+      const response = await axiosInstance.post(`/login?role=${role}`, data)
 
       const { message } = response.data
 
       return { ...response.data.data, message }
+    } catch (error) {
+      throw error.response.data
+    }
+  }
+
+  const register = async (data) => {
+    try {
+      const response = await axiosInstance.post('/register', data)
+
+      return response.data
     } catch (error) {
       throw error.response.data
     }
@@ -170,6 +177,7 @@ export const useApi = () => {
 
   return {
     login,
+    register,
     getAllCategory,
     getAllProduct,
     getProduct,
