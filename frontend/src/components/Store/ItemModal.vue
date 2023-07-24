@@ -1,66 +1,42 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useStoreStore } from '../../stores/store'
 import { useProductStore } from '../../stores/product'
-import { useAlert } from '../../composable/useAlert'
-import { useApi } from '../../composable/useApi'
 import { useFormValidation } from '../../composable/useFormValidation'
 import FormWrapper from '../UI/FormWrapper.vue'
 import InputWrapper from '../UI/InputWrapper.vue'
 
 const productStore = useProductStore()
 const storeStore = useStoreStore()
-const { addNewProduct, toggleModal } = storeStore
+const { addOrUpdateProduct, toggleModal } = storeStore
+const { modalType, formData, formError, initialCategory } =
+  storeToRefs(storeStore)
 const { categories } = storeToRefs(productStore)
 const { getCategories } = productStore
-const { addStoreProduct } = useApi()
-const { showAlert } = useAlert()
 
-const formData = reactive({
-  name: '',
-  description: '',
-  image: '',
-  categoryId: '',
-  price: '',
-  stock: ''
-})
-const formError = reactive({
-  name: null,
-  description: null,
-  image: null,
-  categoryId: null,
-  price: null,
-  stock: null
-})
 const errorMessage = ref(null)
 const { validationRules, fieldValidation, validFieldForm, responseError } =
   useFormValidation(formData, formError, errorMessage)
 
 onMounted(async () => {
   await getCategories()
-  formData.categoryId = categories.value[0].id
+  initialCategory.value = categories.value[0].id
 })
 
 const handleFileChange = (event) => {
-  formData.image = event.target.files[0]
+  formData.value.image = event.target.files[0]
 }
 
 const handleSubmit = async () => {
-  Object.keys(formData).forEach((fieldName) =>
+  Object.keys(formData.value).forEach((fieldName) =>
     fieldValidation(validationRules(fieldName), fieldName)
   )
 
   const validForm = validFieldForm()
   if (validForm) {
     try {
-      const { product, message } = await addStoreProduct(formData)
-      if (product) {
-        showAlert('success', message).then(() => {
-          addNewProduct(product)
-          toggleModal()
-        })
-      }
+      await addOrUpdateProduct()
     } catch (error) {
       responseError(error)
     }
@@ -75,7 +51,7 @@ const handleSubmit = async () => {
     :submit="handleSubmit"
   >
     <h2 class="pb-6 text-center text-2xl font-bold text-sky-400">
-      新增上架商品
+      {{ modalType === 'updateItem' ? '更新' : '新增' }}上架商品
     </h2>
     <InputWrapper
       name="商品名稱"

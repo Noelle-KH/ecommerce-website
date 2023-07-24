@@ -73,6 +73,21 @@ export const useApi = () => {
     }
   }
 
+  const updateStoreProduct = async (id, product) => {
+    try {
+      const response = await axiosAuthInstance.put(
+        `/products/${id}`,
+        { ...product },
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      )
+      const { message } = response.data
+
+      return { ...response.data.data, message }
+    } catch (error) {
+      throw error.response.data
+    }
+  }
+
   const updateProductStatus = async (id, active) => {
     try {
       const response = await axiosAuthInstance.patch(
@@ -159,6 +174,7 @@ export const useApi = () => {
     getAllProduct,
     getProduct,
     addStoreProduct,
+    updateStoreProduct,
     updateProductStatus,
     deleteStoreProduct,
     getAllCartItem,

@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useApi } from '../composable/useApi'
+import { useAlert } from '../composable/useAlert'
 
 const toggleData = (id, originPosition, newPosition) => {
   const product = originPosition.value.find((product) => product.id === id)
@@ -17,12 +18,39 @@ const toggleData = (id, originPosition, newPosition) => {
 }
 
 export const useStoreStore = defineStore('store', () => {
-  const { getAllProduct, updateProductStatus, deleteStoreProduct } = useApi()
-  const showAddItemModal = ref(false)
+  const {
+    getAllProduct,
+    updateProductStatus,
+    deleteStoreProduct,
+    addStoreProduct,
+    updateStoreProduct
+  } = useApi()
+  const { showAlert } = useAlert()
+  const showItemModal = ref(false)
   const activeProducts = ref([])
   const nonActiveProducts = ref([])
   const isLoading = ref(false)
   const errorMessage = ref(null)
+  const modalType = ref('addItem')
+  const initialCategory = ref(null)
+  const updateProduct = ref(null)
+
+  const formData = ref({
+    name: '',
+    description: '',
+    image: '',
+    categoryId: '',
+    price: '',
+    stock: ''
+  })
+  const formError = ref({
+    name: null,
+    description: null,
+    image: null,
+    categoryId: null,
+    price: null,
+    stock: null
+  })
 
   const getStoreProducts = async (active = true) => {
     try {
@@ -39,8 +67,35 @@ export const useStoreStore = defineStore('store', () => {
     }
   }
 
-  const addNewProduct = (product) => {
-    activeProducts.value = [product, ...activeProducts.value]
+  const addOrUpdateProduct = async () => {
+    try {
+      if (modalType.value === 'addItem') {
+        const { product, message } = await addStoreProduct(formData.value)
+
+        if (product) {
+          showAlert('success', message).then(() => {
+            activeProducts.value = [product, ...activeProducts.value]
+            toggleModal()
+          })
+        }
+      } else {
+        const { product, message } = await updateStoreProduct(
+          updateProduct.value.id,
+          formData.value
+        )
+
+        if (product) {
+          showAlert('success', message).then(() => {
+            activeProducts.value = activeProducts.value.map((activeProduct) =>
+              activeProduct.id === product.id ? product : activeProduct
+            )
+            toggleModal()
+          })
+        }
+      }
+    } catch (error) {
+      throw { code: error.code, message: error.message }
+    }
   }
 
   const toggleActive = async (id, active) => {
@@ -67,17 +122,45 @@ export const useStoreStore = defineStore('store', () => {
     }
   }
 
-  const toggleModal = () => {
-    showAddItemModal.value = !showAddItemModal.value
+  const toggleModal = (id) => {
+    showItemModal.value = !showItemModal.value
+
+    Object.keys(formError.value).forEach(
+      (fieldName) => (formError.value[fieldName] = null)
+    )
+
+    if (showItemModal.value && id) {
+      modalType.value = 'updateItem'
+      updateProduct.value = activeProducts.value.find(
+        (product) => product.id === id
+      )
+
+      Object.keys(formData.value).forEach((fieldName) =>
+        fieldName === 'categoryId'
+          ? (formData.value[fieldName] = updateProduct.value.category.id)
+          : (formData.value[fieldName] = updateProduct.value[fieldName])
+      )
+    } else {
+      modalType.value = 'addItem'
+      Object.keys(formData.value).forEach((fieldName) =>
+        fieldName === 'categoryId'
+          ? (formData.value[fieldName] = initialCategory)
+          : (formData.value[fieldName] = null)
+      )
+    }
   }
 
   return {
     isLoading,
-    showAddItemModal,
+    modalType,
+    formData,
+    formError,
+    initialCategory,
+    showItemModal,
     activeProducts,
     nonActiveProducts,
     errorMessage,
-    addNewProduct,
+    addOrUpdateProduct,
     getStoreProducts,
     toggleActive,
     deleteProduct,

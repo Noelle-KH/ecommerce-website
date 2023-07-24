@@ -46,18 +46,25 @@ const switchErrorCode = (code) => {
 
 export const useFormValidation = (formData, formError, errorMessage) => {
   const validationRules = (fieldName) => {
-    if (!formData[fieldName]) return `${switchErrorName(fieldName)}不得為空`
+    if (!formData.value[fieldName])
+      return `${switchErrorName(fieldName)}不得為空`
+    if (
+      typeof formData.value[fieldName] === 'string' &&
+      fieldName === 'image'
+    ) {
+      return '請上傳新圖片'
+    }
     return null
   }
 
   const fieldValidation = (validator, fieldName) => {
-    return (formError[fieldName] = validator || null)
+    return (formError.value[fieldName] = validator || null)
   }
 
   const validFieldForm = () => {
-    const errorKeys = Object.keys(formError)
+    const errorKeys = Object.keys(formError.value)
     for (const key of errorKeys) {
-      if (formError[key] !== null) {
+      if (formError.value[key] !== null) {
         return false
       }
     }
@@ -67,15 +74,14 @@ export const useFormValidation = (formData, formError, errorMessage) => {
   const responseError = (error) => {
     const { code, message } = error
     const errorField = switchErrorCode(code)
-
     if (!errorField) {
       errorMessage.value = '伺服器錯誤，請稍後再使用'
     } else if (errorField === 'account password') {
       errorField
         .split(' ')
-        .forEach((fieldName) => (formError[fieldName] = message))
+        .forEach((fieldName) => (formError.value[fieldName] = message))
     } else {
-      formError[errorField] = message
+      formError.value[errorField] = message
     }
   }
 

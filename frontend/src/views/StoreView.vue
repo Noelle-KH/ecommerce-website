@@ -6,8 +6,8 @@ import { useAuthStore } from '../stores/auth'
 import { useStoreStore } from '../stores/store'
 import { useAlert } from '../composable/useAlert'
 
-const AddItemModal = defineAsyncComponent(() =>
-  import('../components/Store/AddItemModal.vue')
+const ItemModal = defineAsyncComponent(() =>
+  import('../components/Store/ItemModal.vue')
 )
 const StoreList = defineAsyncComponent(() =>
   import('../components/Store/StoreList.vue')
@@ -17,7 +17,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const storeStore = useStoreStore()
 const { isAuthenticate, user } = storeToRefs(authStore)
-const { showAddItemModal } = storeToRefs(storeStore)
+const { showItemModal } = storeToRefs(storeStore)
 const { showAlert } = useAlert()
 
 onMounted(() => {
@@ -35,7 +35,7 @@ onMounted(() => {
 
 <template>
   <main v-if="isAuthenticate && user.role === 'seller'" class="px-10 py-12">
-    <AddItemModal v-if="showAddItemModal" />
+    <ItemModal v-if="showItemModal" />
     <StoreList :active="true" />
     <StoreList :active="false" />
   </main>

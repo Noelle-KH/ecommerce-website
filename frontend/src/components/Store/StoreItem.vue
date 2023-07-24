@@ -8,7 +8,7 @@ import { useAlert } from '../../composable/useAlert'
 defineProps(['active', 'product'])
 
 const storeStore = useStoreStore()
-const { toggleActive, deleteProduct } = storeStore
+const { toggleModal, toggleActive, deleteProduct } = storeStore
 const { showAlert } = useAlert()
 
 const handleDeleteProduct = (id) => {
@@ -36,7 +36,7 @@ const handleDeleteProduct = (id) => {
       />
     </td>
     <td>
-      <img :src="product.image" class="mx-auto w-20 h-20 object-cover" />
+      <img :src="product.image" class="mx-auto h-20 w-20 object-cover" />
     </td>
     <td>{{ product.name }}</td>
     <td>{{ product.description }}</td>
@@ -48,7 +48,7 @@ const handleDeleteProduct = (id) => {
         class="mx-auto h-5 w-5 cursor-pointer"
         @click="toggleActive(product.id, active)"
       />
-      <span v-else>更新</span>
+      <span v-else @click="toggleModal(product.id)">更新</span>
     </td>
   </tr>
 </template>
