@@ -1,16 +1,30 @@
 const createError = require('http-errors')
 
-const loginValidation = (req, res, next) => {
-  const { account, password } = req.body
-  if (!account) {
-    return next(createError(400, '帳號不得為空', { code: 4001 }))
-  }
+const authValidation = (type) => {
+  return (req, res, next) => {
+    const { account, password } = req.body
+    if (!account) {
+      return next(createError(400, '帳號不得為空', { code: 4001 }))
+    }
 
-  if (!password) {
-    return next(createError(400, '密碼不得為空', { code: 4002 }))
-  }
+    if (!password) {
+      return next(createError(400, '密碼不得為空', { code: 4002 }))
+    }
 
-  next()
+    if (type === 'register') {
+      const { confirmPassword } = req.body
+
+      if (!confirmPassword) {
+        return next(createError(400, '確認密碼不得為空', { code: 4009 }))
+      }
+
+      if (confirmPassword !== password) {
+        return next(createError(400, '密碼和確認密碼不相符', { code: 4010 }))
+      }
+    }
+
+    next()
+  }
 }
 
 const productValidation = (req, res, next) => {
@@ -35,4 +49,4 @@ const productValidation = (req, res, next) => {
   next()
 }
 
-module.exports = { loginValidation, productValidation }
+module.exports = { authValidation, productValidation }

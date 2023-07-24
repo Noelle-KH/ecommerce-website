@@ -63,6 +63,28 @@ const authController = {
     } catch (error) {
       next(error)
     }
+  },
+  register: async (req, res, next) => {
+    try {
+      const { account, password } = req.body
+
+      await prisma.user.create({
+        data: {
+          account,
+          password: bcrypt.hashSync(password, 10),
+          cart: {
+            create: {}
+          }
+        }
+      })
+
+      res.json({
+        status: 'success',
+        message: '註冊成功，請重新登入'
+      })
+    } catch (error) {
+      next(error)
+    }
   }
 }
 

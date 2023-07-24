@@ -9,6 +9,12 @@ const errorHandler = (error, req, res, next) => {
     message = '檔案超過限制大小'
   }
 
+  if (error.code === 'P2002') {
+    statusCode = 400
+    code = 4001
+    message = '註冊帳號已存在'
+  }
+
   const status = statusCode.toString().startsWith('4') ? 'fail' : 'error'
 
   if (process.env.NODE_ENV === 'production') {
