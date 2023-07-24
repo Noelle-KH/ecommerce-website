@@ -54,28 +54,28 @@ export const useProductStore = defineStore('product', () => {
         searchResult.value = null
         return router.replace({ name: 'ProductList' })
       }
+
       searchResult.value = products.value.filter((product) =>
         product.name.includes(searchQuery.value)
       )
+
       router.replace({
         name: 'SearchView',
         query: { keyword: searchQuery.value }
       })
-    } else if (searchType === 'amount') {
-      searchResult.value = products.value.filter(
-        (product) =>
-          product.price <= searchQuery.value.max &&
-          product.price >= searchQuery.value.min
-      )
-      router.replace({
-        name: 'SearchView',
-        query: searchQuery.value
-      })
-      searchQuery.value = ''
-    } else if (searchType === 'category') {
-      searchResult.value = products.value.filter(
-        (product) => product.category.id === searchQuery.value.categoryId
-      )
+    } else {
+      if (searchType === 'amount') {
+        searchResult.value = products.value.filter(
+          (product) =>
+            product.price <= searchQuery.value.max &&
+            product.price >= searchQuery.value.min
+        )
+      } else if (searchType === 'category') {
+        searchResult.value = products.value.filter(
+          (product) => product.category.id === searchQuery.value.categoryId
+        )
+      }
+
       router.replace({
         name: 'SearchView',
         query: searchQuery.value

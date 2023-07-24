@@ -13,20 +13,16 @@ const { products, searchResult, searchQuery, errorMessage, isLoading } =
 const { getProducts } = productStore
 
 onMounted(async () => {
-  if (route.query) {
-    if (Object.keys(route.query) === 'keyword') {
-      searchQuery.value = Object.values(route.query)
-    }
-    await getProducts(route.query)
-  } else {
-    await getProducts()
+  if (Object.keys(route.query).includes('keyword')) {
+    searchQuery.value = Object.values(route.query)[0]
   }
+  await getProducts(route.query)
 })
 </script>
 
 <template>
   <section class="relative flex-auto">
-    <h3 class="mb-6 text-xl font-bold text-orange-400">新上市商品</h3>
+    <h3 class="mb-6 text-xl font-bold text-orange-400">上架商品</h3>
     <p v-if="errorMessage" class="text-center text-red-500">
       {{ errorMessage }}
     </p>
