@@ -5,7 +5,7 @@ const productSeed = require('./seeds/product-seed.json')
 
 async function main () {
   await prisma.$transaction(async (tx) => {
-    await prisma.user.create({
+    await tx.user.create({
       data: {
         account: 'seller001',
         password: bcrypt.hashSync('titaner', 10),
