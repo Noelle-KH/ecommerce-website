@@ -116,7 +116,23 @@ const productController = {
         categoryId
       }
 
-      const product = await prisma.product.create({ data })
+      const product = await prisma.product.create({
+        data,
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          image: true,
+          price: true,
+          stock: true,
+          category: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        }
+      })
 
       res.json({
         status: 'success',
@@ -150,11 +166,31 @@ const productController = {
         categoryId
       }
 
-      await prisma.product.update({ where: { id }, data: { ...updateData } })
+      const product = await prisma.product.update({
+        where: { id },
+        data: { ...updateData },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          image: true,
+          price: true,
+          stock: true,
+          category: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        }
+      })
 
       res.json({
         status: 'success',
-        message: '商品更新成功'
+        message: '商品更新成功',
+        data: {
+          product
+        }
       })
     } catch (error) {
       next(error)
