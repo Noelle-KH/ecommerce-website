@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { defineStore } from 'pinia'
 import { useApi } from '../composable/useApi'
@@ -13,6 +13,16 @@ export const useProductStore = defineStore('product', () => {
   const categories = ref([])
   const isLoading = ref(false)
   const errorMessage = ref(null)
+  const orderBy = ref('createdAt')
+  const sortedProduct = computed(() => {
+    if (orderBy.value === 'priceAsc') {
+      return searchResult.value.slice().sort((a, b) => a.price - b.price)
+    } else if (orderBy.value === 'priceDesc') {
+      return searchResult.value.slice().sort((a, b) => b.price - a.price)
+    } else {
+      return searchResult.value
+    }
+  })
 
   const getProducts = async (filterQuery) => {
     try {
@@ -51,17 +61,19 @@ export const useProductStore = defineStore('product', () => {
   const setSearchResult = (searchType) => {
     if (searchType === 'keyword') {
       if (!searchQuery.value) {
-        searchResult.value = null
-        return router.replace({ name: 'ProductList' })
+        searchResult.value = products.value
+        orderBy.value = 'createdAt'
+        return router.replace({
+          name: 'ProductList'
+        })
       }
-
       searchResult.value = products.value.filter((product) =>
         product.name.includes(searchQuery.value)
       )
 
       router.replace({
         name: 'SearchView',
-        query: { keyword: searchQuery.value }
+        query: { keyword: searchQuery.value, orderBy: orderBy.value }
       })
     } else {
       if (searchType === 'amount') {
@@ -78,7 +90,7 @@ export const useProductStore = defineStore('product', () => {
 
       router.replace({
         name: 'SearchView',
-        query: searchQuery.value
+        query: { ...searchQuery.value, orderBy: orderBy.value }
       })
       searchQuery.value = ''
     }
@@ -90,6 +102,8 @@ export const useProductStore = defineStore('product', () => {
     product,
     searchQuery,
     searchResult,
+    orderBy,
+    sortedProduct,
     categories,
     errorMessage,
     getProducts,

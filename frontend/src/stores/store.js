@@ -56,9 +56,13 @@ export const useStoreStore = defineStore('store', () => {
     try {
       isLoading.value = true
       if (active) {
-        activeProducts.value = await getAllProduct(active)
+        activeProducts.value = await getAllProduct(active, {
+          orderBy: 'updatedAt'
+        })
       } else {
-        nonActiveProducts.value = await getAllProduct(active)
+        nonActiveProducts.value = await getAllProduct(active, {
+          orderBy: 'updatedAt'
+        })
       }
     } catch (error) {
       throw error.message

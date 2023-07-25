@@ -36,15 +36,17 @@ export const useApi = () => {
     try {
       let query = ''
       if (filter.min >= 0 && filter.max >= 0) {
-        query = `?min=${filter.min}&max=${filter.max}`
+        query = `?min=${filter.min}&max=${filter.max}&orderBy=${filter.orderBy}`
       } else if (filter.keyword) {
-        query = `?keyword=${filter.keyword}`
+        query = `?keyword=${filter.keyword}&orderBy=${filter.orderBy}`
       } else if (filter.categoryId) {
-        query = `?categoryId=${filter.categoryId}`
+        query = `?categoryId=${filter.categoryId}&orderBy=${filter.orderBy}`
+      } else {
+        query = `?orderBy=${filter.orderBy}`
       }
 
       if (active === false) {
-        query = `?active=${active}`
+        query = `?active=${active}&orderBy=${filter.orderBy}`
       }
 
       const response = await axiosInstance.get(`/products${query}`)
