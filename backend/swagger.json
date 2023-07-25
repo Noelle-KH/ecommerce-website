@@ -41,7 +41,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Login"
+                "type": "object",
+                "properties": {
+                  "account": {
+                    "type": "string",
+                    "example": "buyer001"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "titaner"
+                  }
+                }
               }
             }
           },
@@ -99,6 +109,63 @@
           },
           "404": {
             "description": "帳號不存在"
+          }
+        }
+      }
+    },
+    "/api/register": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "description": "輸入註冊使用者帳號、密碼和確認密碼",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "account": {
+                    "type": "string",
+                    "example": "buyer001"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "titaner"
+                  },
+                  "confirmPassword": {
+                    "type": "string",
+                    "example": "titaner"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "註冊成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "註冊成功，請重新登入"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "欄位相關驗證錯誤(如：帳號不得為空、密碼不得為空、確認密碼不得為空、確認密碼與密碼不相符、註冊帳號已存在等)"
           }
         }
       }
@@ -168,33 +235,12 @@
                       "example": "success"
                     },
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
-                          },
-                          "name": {
-                            "type": "string",
-                            "example": "狗狗罐頭"
-                          },
-                          "description": {
-                            "type": "string",
-                            "example": "好吃的狗狗罐頭！"
-                          },
-                          "image": {
-                            "type": "string",
-                            "example": "https://www.example.com"
-                          },
-                          "price": {
-                            "type": "number",
-                            "example": 23
-                          },
-                          "stock": {
-                            "type": "number",
-                            "example": 30
+                      "type": "object",
+                      "properties": {
+                        "products": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Product"
                           }
                         }
                       }
@@ -215,7 +261,34 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Product"
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "狗狗罐頭"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "好吃的狗狗罐頭！"
+                  },
+                  "image": {
+                    "type": "file",
+                    "format": "binary",
+                    "example": "JPG或PNG圖片檔"
+                  },
+                  "price": {
+                    "type": "number",
+                    "example": 23
+                  },
+                  "stock": {
+                    "type": "number",
+                    "example": 30
+                  },
+                  "categoryId": {
+                    "type": "string",
+                    "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+                  }
+                }
               }
             }
           },
@@ -240,29 +313,8 @@
                     "data": {
                       "type": "object",
                       "properties": {
-                        "id": {
-                          "type": "string",
-                          "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
-                        },
-                        "name": {
-                          "type": "string",
-                          "example": "狗狗罐頭"
-                        },
-                        "description": {
-                          "type": "string",
-                          "example": "好吃的狗狗罐頭！"
-                        },
-                        "image": {
-                          "type": "string",
-                          "example": "https://www.example.com"
-                        },
-                        "price": {
-                          "type": "number",
-                          "example": 23
-                        },
-                        "stock": {
-                          "type": "number",
-                          "example": 30
+                        "product": {
+                          "$ref": "#/components/schemas/Product"
                         }
                       }
                     }
@@ -284,6 +336,52 @@
       }
     },
     "/api/products/:id": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "商品的id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "取得特定商品的詳細資料",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "product": {
+                          "$ref": "#/components/schemas/Product"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "該商品不存在"
+          }
+        }
+      },
       "put": {
         "tags": [
           "products"
@@ -305,7 +403,34 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Product"
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "狗狗罐頭"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "好吃的狗狗罐頭！"
+                  },
+                  "image": {
+                    "type": "file",
+                    "format": "binary",
+                    "example": "JPG或PNG圖片檔"
+                  },
+                  "price": {
+                    "type": "number",
+                    "example": 23
+                  },
+                  "stock": {
+                    "type": "number",
+                    "example": 30
+                  },
+                  "categoryId": {
+                    "type": "string",
+                    "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+                  }
+                }
               }
             }
           },
@@ -326,6 +451,9 @@
                     "message": {
                       "type": "string",
                       "example": "商品更新成功"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Product"
                     }
                   }
                 }
@@ -466,25 +594,17 @@
                     "data": {
                       "type": "object",
                       "properties": {
-                        "id": {
-                          "type": "string",
-                          "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
-                        },
-                        "cartItem": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "string",
-                                "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
-                              },
-                              "amount": {
-                                "type": "number",
-                                "example": 5
-                              },
-                              "product": {
-                                "$ref": "#/components/schemas/Product"
+                        "cart": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+                            },
+                            "cartItem": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/CartItem"
                               }
                             }
                           }
@@ -564,42 +684,8 @@
                     "data": {
                       "type": "object",
                       "properties": {
-                        "id": {
-                          "type": "string",
-                          "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
-                        },
-                        "amount": {
-                          "type": "number",
-                          "example": 1
-                        },
-                        "product": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "string",
-                              "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
-                            },
-                            "name": {
-                              "type": "string",
-                              "example": "狗狗罐頭"
-                            },
-                            "description": {
-                              "type": "string",
-                              "example": "好吃的狗狗罐頭！"
-                            },
-                            "image": {
-                              "type": "string",
-                              "example": "https://www.example.com"
-                            },
-                            "price": {
-                              "type": "number",
-                              "example": 30
-                            },
-                            "stock": {
-                              "type": "number",
-                              "example": 20
-                            }
-                          }
+                        "cartItem": {
+                          "$ref": "#/components/schemas/CartItem"
                         }
                       }
                     }
@@ -854,6 +940,10 @@
       "Product": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string",
+            "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+          },
           "name": {
             "type": "string",
             "example": "狗狗罐頭"
@@ -873,6 +963,35 @@
           "stock": {
             "type": "number",
             "example": 30
+          },
+          "category": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+              },
+              "name": {
+                "type": "string",
+                "example": "狗狗商品"
+              }
+            }
+          }
+        }
+      },
+      "CartItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
+          },
+          "amount": {
+            "type": "number",
+            "example": 12
+          },
+          "product": {
+            "$ref": "#/components/schemas/Product"
           }
         }
       }
