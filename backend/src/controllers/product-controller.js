@@ -8,6 +8,13 @@ const productController = {
       const active = req.query.active !== 'false'
       const { keyword, min, max, orderBy, categoryId } = req.query
 
+      const orderByType = {
+        createdAt: { createdAt: 'desc' },
+        updatedAt: { updatedAt: 'desc' },
+        priceDesc: { price: 'desc' },
+        priceAsc: { price: 'asc' }
+      }
+
       let filter = {
         where: { active },
         select: {
@@ -24,7 +31,7 @@ const productController = {
             }
           }
         },
-        orderBy: { createdAt: 'desc' }
+        orderBy: orderByType[orderBy]
       }
 
       if (keyword) {
@@ -38,8 +45,7 @@ const productController = {
           where: {
             active,
             price: { lte: Number(max), gte: Number(min) }
-          },
-          orderBy: { price: 'desc' }
+          }
         }
       } else if (categoryId) {
         filter = {
@@ -49,10 +55,6 @@ const productController = {
             categoryId
           }
         }
-      }
-
-      if (orderBy) {
-        filter = { ...filter, orderBy: { [orderBy]: 'desc' } }
       }
 
       const products = await prisma.product.findMany(filter)

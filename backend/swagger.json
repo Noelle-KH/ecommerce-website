@@ -220,6 +220,15 @@
               "type": "string",
               "example": "852896de-e3c7-4ca1-9b9a-c95290fd72e0"
             }
+          },
+          {
+            "in": "query",
+            "name": "orderBy",
+            "description": "商品排序方式",
+            "schema": {
+              "type": "string",
+              "example": "createdAt"
+            }
           }
         ],
         "responses": {
