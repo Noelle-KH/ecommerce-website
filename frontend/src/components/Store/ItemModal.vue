@@ -16,6 +16,7 @@ const { categories } = storeToRefs(productStore)
 const { getCategories } = productStore
 
 const errorMessage = ref(null)
+const isLoading = ref(false)
 const { validationRules, fieldValidation, validFieldForm, responseError } =
   useFormValidation(formData, formError, errorMessage)
 
@@ -36,9 +37,12 @@ const handleSubmit = async () => {
   const validForm = validFieldForm()
   if (validForm) {
     try {
+      isLoading.value = true
       await addOrUpdateProduct()
     } catch (error) {
       responseError(error)
+    } finally {
+      isLoading.value = false
     }
   }
 }
@@ -133,8 +137,11 @@ const handleSubmit = async () => {
     <p v-if="errorMessage" class="mb-4 text-center text-xs text-red-500">
       {{ errorMessage }}
     </p>
-    <button class="w-full rounded-sm border bg-sky-300 py-1 hover:bg-sky-200">
-      新增商品
+    <button
+      class="w-full rounded-sm border bg-sky-300 py-1 hover:bg-sky-200 disabled:bg-sky-200"
+      :disabled="isLoading"
+    >
+      {{ modalType === 'updateItem' ? '更新' : '新增' }}商品
     </button>
   </FormWrapper>
 </template>

@@ -21,6 +21,7 @@ export const useAuthStore = defineStore('auth', () => {
     confirmPassword: null
   })
   const errorMessage = ref(null)
+  const isLoading = ref(false)
   const { resetForm } = useFormValidation(formData, formError, errorMessage)
 
   const changeAuthenticateStatus = (status) => {
@@ -39,6 +40,10 @@ export const useAuthStore = defineStore('auth', () => {
 
   const toggleModal = () => {
     showAuthModal.value = !showAuthModal.value
+
+    resetForm()
+    modalType.value = '登入'
+    loginType.value = '會員'
   }
 
   const changeTitle = () => {
@@ -60,6 +65,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const registerOrLogin = async () => {
     try {
+      isLoading.value = true
       if (modalType.value === '登入') {
         const role = loginType.value === '會員' ? 'buyer' : 'seller'
         const { user, token, message } = await login(role, formData.value)
@@ -72,6 +78,8 @@ export const useAuthStore = defineStore('auth', () => {
       }
     } catch (error) {
       throw { code: error.code, message: error.message }
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -82,6 +90,7 @@ export const useAuthStore = defineStore('auth', () => {
     formData,
     formError,
     modalType,
+    isLoading,
     showAuthModal,
     changeAuthenticateStatus,
     updateUserCart,

@@ -16,7 +16,7 @@ const {
   changeModalType,
   registerOrLogin
 } = authStore
-const { formData, formError, errorMessage, loginType, modalType } =
+const { formData, formError, errorMessage, loginType, modalType, isLoading } =
   storeToRefs(authStore)
 const { getCartItems } = cartStore
 const { showAlert } = useAlert()
@@ -118,9 +118,10 @@ const handleSubmit = async () => {
       class="w-full rounded-sm border py-1"
       :class="[
         loginType === '會員'
-          ? 'bg-orange-400 hover:bg-orange-300'
-          : 'bg-sky-400 hover:bg-sky-300'
+          ? 'bg-orange-400 hover:bg-orange-300 disabled:bg-orange-300'
+          : 'bg-sky-400 hover:bg-sky-300 disabled:bg-sky-300'
       ]"
+      :disabled="isLoading"
     >
       {{ modalType }}
     </button>

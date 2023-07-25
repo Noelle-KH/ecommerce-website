@@ -60,6 +60,7 @@ const handleAddCartItem = async (id) => {
         <p>商品庫存： {{ product.stock }} 件</p>
         <div class="flex justify-center gap-3">
           <CartIcon
+            v-show="user?.role !== 'seller' && product.stock !== 0"
             class="h-6 w-6 cursor-pointer text-orange-400 hover:text-orange-500"
             @click="handleAddCartItem(product.id)"
           />
