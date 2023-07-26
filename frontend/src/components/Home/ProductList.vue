@@ -25,7 +25,7 @@ onMounted(async () => {
     searchQuery.value = Object.values(route.query)[0]
   }
   orderBy.value = route.query.orderBy || 'createdAt'
-  await getProducts(route.query)
+  await getProducts({ ...route.query, orderBy: orderBy.value })
 })
 
 const handleChangeOrderBy = () => {
@@ -45,7 +45,7 @@ const handleChangeOrderBy = () => {
         v-model="orderBy"
         @change="handleChangeOrderBy"
       >
-        <option value="createdAt">依上市時間排序</option>
+        <option value="createdAt">依上架時間排序</option>
         <option value="priceDesc">依金額高到低排序</option>
         <option value="priceAsc">依金額低到高排序</option>
       </select>

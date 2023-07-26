@@ -48,7 +48,7 @@ const handleLogout = () => {
   <header
     class="w-full bg-white px-10 py-5"
     :class="[
-      (route.path === '/' || route.path === '/search') && !showAuthModal
+      route.path !== '/cart' && route.path !== '/store' && !showAuthModal
         ? 'sticky left-0 top-0 z-10 shadow-md'
         : ''
     ]"
@@ -92,7 +92,7 @@ const handleLogout = () => {
       </div>
       <div class="flex items-center gap-5">
         <RouterLink
-          v-if="route.path === '/' || route.path === '/search'"
+          v-if="route.path !== '/cart' && route.path !== '/store'"
           :to="
             user?.role === 'seller'
               ? { name: 'StoreView' }

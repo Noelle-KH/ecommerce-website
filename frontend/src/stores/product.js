@@ -30,7 +30,7 @@ export const useProductStore = defineStore('product', () => {
       if (filterQuery) {
         searchResult.value = await getAllProduct(true, filterQuery)
       }
-      products.value = await getAllProduct(true)
+      products.value = await getAllProduct(true, { orderBy: orderBy.value })
     } catch (error) {
       console.error(error)
     } finally {
