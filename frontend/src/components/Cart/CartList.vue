@@ -35,7 +35,9 @@ const handleCheckout = () => {
     if (result.isConfirmed) {
       try {
         const cartId = await checkout()
-        return updateUserCart(cartId)
+        if (cartId) {
+          return updateUserCart(cartId)
+        }
       } catch (error) {
         console.error(error)
       }
@@ -55,8 +57,8 @@ const handleCheckout = () => {
       {{ errorMessage }}
     </p>
     <TableWrapper type="cart" v-if="cartItems && cartItems.length">
-      <template #header
-        ><th>刪除</th>
+      <template #header>
+        <th>刪除</th>
         <th>圖片</th>
         <th>名稱</th>
         <th>單價</th>

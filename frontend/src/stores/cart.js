@@ -1,10 +1,13 @@
 import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { defineStore } from 'pinia'
 import { useApi } from '../composable/useApi'
 import { useAlert } from '../composable/useAlert'
 
 export const useCartStore = defineStore('cart', () => {
+  const route = useRoute()
   const {
+    getAllProduct,
     getAllCartItem,
     addCartItem,
     updateCartItemAmount,
@@ -37,6 +40,9 @@ export const useCartStore = defineStore('cart', () => {
     try {
       isLoading.value = true
       cartItems.value = await getAllCartItem()
+      if (route.path === '/cart') {
+        adjustCartItem()
+      }
     } catch (error) {
       throw error.message
     } finally {
@@ -122,6 +128,57 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
+  const adjustCartItem = async () => {
+    const products = await getAllProduct(true)
+    const itemToUpdate = []
+    const itemToDelete = []
+
+    cartItems.value.forEach((cartItem) => {
+      const product = products.find(
+        (product) => product.id === cartItem.product.id
+      )
+
+      if (!product || product.stock === 0) {
+        itemToDelete.push(cartItem.id)
+      } else if (product && cartItem.amount > product.stock) {
+        itemToUpdate.push({ id: cartItem.id, amount: product.stock })
+      }
+    })
+
+    if (itemToDelete.length > 0) {
+      await Promise.all(itemToDelete.map((id) => deleteCartItem(id)))
+    }
+
+    if (itemToUpdate.length > 0) {
+      await Promise.all(
+        itemToUpdate.map((item) => updateCartItemAmount(item.id, item.amount))
+      )
+    }
+
+    if (itemToDelete.length > 0 || itemToUpdate.length > 0) {
+      showAlert('info', '購物車商品數量變動').then(() => {
+        cartItems.value = cartItems.value
+          .map((cartItem) => {
+            const product = products.find(
+              (product) => product.id === cartItem.product.id
+            )
+            if (!product || product.stock === 0) {
+              return null
+            } else if (product && cartItem.amount > product.stock) {
+              return {
+                ...cartItem,
+                amount: product.stock,
+                product: { ...cartItem.product, stock: product.stock }
+              }
+            } else {
+              return cartItem
+            }
+          })
+          .filter((cartItem) => cartItem !== null)
+      })
+    }
+  }
+
   const checkout = async () => {
     try {
       const { status, data } = await updateCartStatus()
@@ -130,26 +187,7 @@ export const useCartStore = defineStore('cart', () => {
         return data.cartId
       }
     } catch (error) {
-      showAlert('error', error.message).then(async () => {
-        const adjustCartItemAmount = cartItems.value
-          .filter((cartItem) => cartItem.amount > cartItem.product.stock)
-          .map((cartItem) => ({
-            id: cartItem.id,
-            amount: cartItem.product.stock
-          }))
-
-        await Promise.all(
-          adjustCartItemAmount.map((cartItem) =>
-            updateCartItemAmount(cartItem.id, cartItem.amount)
-          )
-        )
-
-        cartItems.value = cartItems.value.map((cartItem) =>
-          cartItem.amount > cartItem.product.stock
-            ? { ...cartItem, amount: cartItem.product.stock }
-            : cartItem
-        )
-      })
+      showAlert('error', error.message).then(async () => adjustCartItem())
     }
   }
 
