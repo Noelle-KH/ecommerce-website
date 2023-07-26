@@ -21,8 +21,7 @@ onMounted(() => {
       : '沒有使用該頁面的權限'
 
     showAlert('error', title)
-
-    return router.go(-1)
+    return router.replace({ name: 'ProductList' })
   }
 })
 </script>

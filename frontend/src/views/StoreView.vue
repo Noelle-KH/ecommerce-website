@@ -28,7 +28,7 @@ onMounted(() => {
 
     showAlert('error', title)
 
-    return router.go(-1)
+    return router.replace({ name: 'ProductList' })
   }
 })
 </script>
